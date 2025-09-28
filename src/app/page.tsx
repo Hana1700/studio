@@ -1,11 +1,6 @@
 import Link from 'next/link';
 import { structures } from '@/lib/data';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { ChevronRight } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -19,22 +14,32 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {structures.map((structure) => (
-          <Link href={`/structure/${structure.id}`} key={structure.id}>
-            <Card className="h-full transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <structure.icon className="h-6 w-6 text-primary" />
+      <div className="overflow-hidden rounded-lg border">
+        <ul className="divide-y">
+          {structures.map((structure) => (
+            <li key={structure.id}>
+              <Link
+                href={`/structure/${structure.id}`}
+                className="block p-4 hover:bg-muted/50"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                      <structure.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{structure.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {structure.subDepartments.length} sous-direction(s)
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <CardTitle className="font-headline">{structure.name}</CardTitle>
-                <CardDescription>
-                  {structure.subDepartments.length} sous-directions
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
