@@ -40,27 +40,17 @@ function ContactCard({ contact }: { contact: Contact }) {
           <p className="text-sm text-muted-foreground">{contact.title}</p>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        <div className="flex items-center gap-3">
+      <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
+        <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
           <Phone className="h-4 w-4 text-muted-foreground" />
-          <a href={`tel:${contact.phone}`} className="hover:text-primary">
-            {contact.phone}
-          </a>
+          <span className="truncate">{contact.phone}</span>
         </div>
         {contact.mobile && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
             <Smartphone className="h-4 w-4 text-muted-foreground" />
-            <a href={`tel:${contact.mobile}`} className="hover:text-primary">
-              {contact.mobile}
-            </a>
+            <span className="truncate">{contact.mobile}</span>
           </div>
         )}
-        <div className="flex items-center gap-3">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          <a href={`mailto:${contact.email}`} className="hover:text-primary">
-            {contact.email}
-          </a>
-        </div>
       </CardContent>
     </Card>
   );
@@ -113,10 +103,11 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nom</TableHead>
-                  <TableHead>Poste / Fonction</TableHead>
-                  <TableHead>Téléphone Fixe</TableHead>
-                  <TableHead>Mobile</TableHead>
-                  <TableHead>Email</TableHead>
+                  <TableHead>Grade</TableHead>
+                  <TableHead>Numéro 1</TableHead>
+                  <TableHead>Numéro 2</TableHead>
+                  <TableHead>Numéro 3</TableHead>
+                  <TableHead>Numéro 4</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -130,9 +121,8 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
                     <TableCell>
                       {contact.mobile ? <a href={`tel:${contact.mobile}`} className="hover:text-primary">{contact.mobile}</a> : <span className="text-muted-foreground">-</span>}
                     </TableCell>
-                    <TableCell>
-                       <a href={`mailto:${contact.email}`} className="hover:text-primary">{contact.email}</a>
-                    </TableCell>
+                    <TableCell><span className="text-muted-foreground">-</span></TableCell>
+                    <TableCell><span className="text-muted-foreground">-</span></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
