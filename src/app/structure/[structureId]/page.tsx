@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Breadcrumbs } from '@/components/breadcrumb';
+import { ChevronRight } from 'lucide-react';
 
 export async function generateStaticParams() {
   return structures.map((structure) => ({
@@ -42,25 +43,32 @@ export default function StructurePage({
       </div>
 
       {structure.subDepartments.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {structure.subDepartments.map((sub) => (
-            <Link
-              href={`/structure/${structure.id}/${sub.id}`}
-              key={sub.id}
-            >
-              <Card className="h-full transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
-                <CardHeader>
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <sub.icon className="h-6 w-6 text-primary" />
+        <div className="overflow-hidden rounded-lg border">
+          <ul className="divide-y">
+            {structure.subDepartments.map((sub) => (
+              <li key={sub.id}>
+                <Link
+                  href={`/structure/${structure.id}/${sub.id}`}
+                  className="block p-4 hover:bg-muted/50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <sub.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{sub.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {sub.contacts.length} contact(s)
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <CardTitle className="font-headline">{sub.name}</CardTitle>
-                  <CardDescription>
-                    {sub.contacts.length} contact(s)
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 py-24 text-center">
