@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,9 +58,9 @@ export default function AdminPage() {
                                     <SelectValue placeholder="Sélectionner un type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="phone">Téléphone</SelectItem>
-                                    <SelectItem value="mobile">Mobile</SelectItem>
-                                    <SelectItem value="fax">Fax</SelectItem>
+                                    <SelectItem value="numero1">Numéro 1</SelectItem>
+                                    <SelectItem value="numero2">Numéro 2</SelectItem>
+                                    <SelectItem value="numero3">Numéro 3</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
