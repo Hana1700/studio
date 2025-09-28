@@ -7,6 +7,9 @@ export interface Contact {
   phone: string;
   mobile?: string;
   email: string;
+  structureId?: string;
+  subDepartmentId?: string;
+  structureName?: string;
 }
 
 export interface SubDepartment {

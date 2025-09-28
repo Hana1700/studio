@@ -22,41 +22,49 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
+import Link from 'next/link';
 
-function ContactCard({ contact }: { contact: Contact }) {
+function ContactCard({ contact }: { contact: Contact & { structureId?: string; subDepartmentId?: string } }) {
+  const contactLink =
+    contact.structureId && contact.subDepartmentId
+      ? `/structure/${contact.structureId}/${contact.subDepartmentId}`
+      : '#';
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar>
-          <AvatarFallback>
-            {contact.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <CardTitle className="font-headline text-lg">{contact.name}</CardTitle>
-          <p className="text-sm text-muted-foreground">{contact.title}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
-        <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
-          <Phone className="h-4 w-4 text-muted-foreground" />
-          <span className="truncate">{contact.phone}</span>
-        </div>
-        {contact.mobile && (
-          <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
-            <Smartphone className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{contact.mobile}</span>
+    <Link href={contactLink} className="block">
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-4">
+          <Avatar>
+            <AvatarFallback>
+              {contact.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <CardTitle className="font-headline text-lg">{contact.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">{contact.title}</p>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
+          <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
+            <Phone className="h-4 w-4 text-muted-foreground" />
+            <span className="truncate">{contact.phone}</span>
+          </div>
+          {contact.mobile && (
+            <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
+              <Smartphone className="h-4 w-4 text-muted-foreground" />
+              <span className="truncate">{contact.mobile}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 
-export function ContactList({ contacts }: { contacts: Contact[] }) {
+export function ContactList({ contacts }: { contacts: (Contact & { structureId?: string, subDepartmentId?: string })[] }) {
   const [search, setSearch] = useState('');
 
   const filteredContacts =
@@ -111,20 +119,34 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredContacts.map((contact) => (
-                  <TableRow key={contact.id}>
-                    <TableCell className="font-medium">{contact.name}</TableCell>
-                    <TableCell>{contact.title}</TableCell>
-                    <TableCell>
-                      <a href={`tel:${contact.phone}`} className="hover:text-primary">{contact.phone}</a>
-                    </TableCell>
-                    <TableCell>
-                      {contact.mobile ? <a href={`tel:${contact.mobile}`} className="hover:text-primary">{contact.mobile}</a> : <span className="text-muted-foreground">-</span>}
-                    </TableCell>
-                    <TableCell><span className="text-muted-foreground">-</span></TableCell>
-                    <TableCell><span className="text-muted-foreground">-</span></TableCell>
-                  </TableRow>
-                ))}
+                {filteredContacts.map((contact) => {
+                  const contactLink =
+                    contact.structureId && contact.subDepartmentId
+                      ? `/structure/${contact.structureId}/${contact.subDepartmentId}`
+                      : undefined;
+                  
+                  const CellComponent = contactLink ? Link : 'div';
+                  const cellProps = contactLink ? { href: contactLink } : {};
+
+                  return (
+                    <TableRow key={contact.id} className={contactLink ? 'cursor-pointer' : ''}>
+                      <TableCell className="font-medium">
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.name}</CellComponent>
+                      </TableCell>
+                      <TableCell>
+                        <CellComponent {...cellProps} className="block">{contact.title}</CellComponent>
+                      </TableCell>
+                      <TableCell>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.phone}</CellComponent>
+                      </TableCell>
+                      <TableCell>
+                        {contact.mobile ? <CellComponent {...cellProps} className="block hover:text-primary">{contact.mobile}</CellComponent> : <span className="text-muted-foreground">-</span>}
+                      </TableCell>
+                      <TableCell><span className="text-muted-foreground">-</span></TableCell>
+                      <TableCell><span className="text-muted-foreground">-</span></TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </Card>
