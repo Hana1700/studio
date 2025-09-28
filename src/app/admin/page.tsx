@@ -9,6 +9,10 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { AlertCircle, PlusCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 export default function AdminPage() {
   return (
@@ -28,11 +32,37 @@ export default function AdminPage() {
                     <DialogHeader>
                         <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
                         <DialogDescription>
-                            Cette fonctionnalité est en cours de développement.
+                            Remplissez les détails ci-dessous.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="py-4">
-                        <p className="text-sm text-muted-foreground">Le formulaire pour ajouter une structure, ses services et leurs numéros de téléphone apparaîtra ici bientôt.</p>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">
+                                Nom
+                            </Label>
+                            <Input id="name" placeholder="Nom de la structure" className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="grade" className="text-right">
+                                Grade
+                            </Label>
+                            <Input id="grade" placeholder="Ex: Directeur" className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="phone-type" className="text-right">
+                                Type de numéro
+                            </Label>
+                             <Select>
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Sélectionner un type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="phone">Téléphone</SelectItem>
+                                    <SelectItem value="mobile">Mobile</SelectItem>
+                                    <SelectItem value="fax">Fax</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
