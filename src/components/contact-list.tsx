@@ -25,10 +25,7 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import Link from 'next/link';
 
 function ContactCard({ contact }: { contact: Contact & { structureId?: string; subDepartmentId?: string } }) {
-  const contactLink =
-    contact.structureId && contact.subDepartmentId
-      ? `/structure/${contact.structureId}/${contact.subDepartmentId}`
-      : '#';
+  const contactLink = `/contact/${contact.id}`;
 
   return (
     <Link href={contactLink} className="block">
@@ -120,16 +117,13 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
               </TableHeader>
               <TableBody>
                 {filteredContacts.map((contact) => {
-                  const contactLink =
-                    contact.structureId && contact.subDepartmentId
-                      ? `/structure/${contact.structureId}/${contact.subDepartmentId}`
-                      : undefined;
+                  const contactLink = `/contact/${contact.id}`;
                   
-                  const CellComponent = contactLink ? Link : 'div';
-                  const cellProps = contactLink ? { href: contactLink } : {};
+                  const CellComponent = Link;
+                  const cellProps = { href: contactLink };
 
                   return (
-                    <TableRow key={contact.id} className={contactLink ? 'cursor-pointer' : ''}>
+                    <TableRow key={contact.id} className={'cursor-pointer'}>
                       <TableCell className="font-medium">
                         <CellComponent {...cellProps} className="block hover:text-primary">{contact.name}</CellComponent>
                       </TableCell>

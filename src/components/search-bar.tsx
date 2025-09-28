@@ -90,7 +90,7 @@ export function SearchBar() {
               <li key={index}>
                 {suggestion.type === 'contact' ? (
                    <Link
-                    href={`/structure/${suggestion.data.structureId}/${suggestion.data.subDepartmentId}`}
+                    href={`/contact/${suggestion.data.id}`}
                     className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-accent"
                     onClick={handleSuggestionClick}
                   >
