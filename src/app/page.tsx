@@ -9,9 +9,6 @@ export default function Home() {
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Annuaire de l'entreprise
         </h1>
-        <p className="text-muted-foreground">
-          Naviguez à travers les structures pour trouver un contact.
-        </p>
       </div>
 
       <div className="overflow-hidden rounded-lg border">
