@@ -91,7 +91,7 @@ export default function AdminPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Zone d'administration
+          Administrateur
         </h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
