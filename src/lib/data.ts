@@ -8,6 +8,7 @@ import {
   Users,
   Handshake,
   Lightbulb,
+  Building,
 } from 'lucide-react';
 
 export const structures: Structure[] = [
@@ -20,7 +21,7 @@ export const structures: Structure[] = [
       {
         id: 'presidence',
         name: 'Présidence',
-        icon: Users,
+        icon: Building,
         contacts: [
           {
             id: '1',
@@ -50,7 +51,7 @@ export const structures: Structure[] = [
       {
         id: 'reseau',
         name: 'Réseau',
-        icon: Network,
+        icon: Building,
         contacts: [
           {
             id: '3',
@@ -72,7 +73,7 @@ export const structures: Structure[] = [
       {
         id: 'developpement',
         name: 'Développement',
-        icon: Code2,
+        icon: Building,
         contacts: [
           {
             id: '5',
@@ -94,7 +95,7 @@ export const structures: Structure[] = [
       {
         id: 'support-technique',
         name: 'Support Technique',
-        icon: Wrench,
+        icon: Building,
         contacts: [
           {
             id: '7',
@@ -117,7 +118,7 @@ export const structures: Structure[] = [
       {
         id: 'recrutement',
         name: 'Recrutement',
-        icon: Handshake,
+        icon: Building,
         contacts: [
           {
             id: '8',
