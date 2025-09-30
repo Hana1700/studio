@@ -1,13 +1,5 @@
 import type { Structure } from '@/lib/types';
 import {
-  Landmark,
-  Building2,
-  Network,
-  Code2,
-  Wrench,
-  Users,
-  Handshake,
-  Lightbulb,
   Building,
 } from 'lucide-react';
 
@@ -15,7 +7,7 @@ export const structures: Structure[] = [
   {
     id: 'direction-generale',
     name: 'Direction Générale',
-    icon: Landmark,
+    icon: Building,
     description: 'Management et direction de l\'entreprise.',
     subDepartments: [
       {
@@ -45,7 +37,7 @@ export const structures: Structure[] = [
   {
     id: 'departement-informatique',
     name: 'Département Informatique',
-    icon: Building2,
+    icon: Building,
     description: 'Gestion des systèmes d\'information et technologies.',
     subDepartments: [
       {
@@ -112,7 +104,7 @@ export const structures: Structure[] = [
   {
     id: 'ressources-humaines',
     name: 'Ressources Humaines',
-    icon: Users,
+    icon: Building,
     description: 'Gestion du personnel et des relations sociales.',
     subDepartments: [
       {
@@ -134,7 +126,7 @@ export const structures: Structure[] = [
   {
     id: 'marketing',
     name: 'Marketing & Communication',
-    icon: Lightbulb,
+    icon: Building,
     description: 'Promotion de l\'image et des produits de l\'entreprise.',
     subDepartments: [],
   },
