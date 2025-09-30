@@ -1,43 +1,23 @@
-import Link from 'next/link';
-import { structures } from '@/lib/data';
-import { ChevronRight } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookUser } from "lucide-react";
+
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Annuaire de l'entreprise
-        </h1>
-      </div>
-
-      <div className="overflow-hidden rounded-lg border">
-        <ul className="divide-y">
-          {structures.map((structure) => (
-            <li key={structure.id}>
-              <Link
-                href={`/structure/${structure.id}`}
-                className="block p-4 hover:bg-muted/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <structure.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{structure.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {structure.subDepartments.length} sous-direction(s)
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+    <div className="flex h-full items-center justify-center">
+        <Card className="w-full max-w-md text-center">
+            <CardHeader>
+                <div className="flex justify-center mb-4">
+                    <BookUser className="h-16 w-16 text-primary" />
                 </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+                <CardTitle className="font-headline text-2xl">Bienvenue dans l'annuaire</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground">
+                    Utilisez le menu sur la gauche pour naviguer entre les différentes structures et trouver les contacts que vous cherchez.
+                </p>
+            </CardContent>
+        </Card>
     </div>
   );
 }

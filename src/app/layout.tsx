@@ -3,6 +3,8 @@ import { AppHeader } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
+import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
 
 export const metadata: Metadata = {
   title: 'Structure Contact Central',
@@ -29,10 +31,21 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <AppHeader />
-          <main className="flex-1 container py-8">{children}</main>
-        </div>
+        <SidebarProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <AppHeader />
+            <div className="flex flex-1">
+              <Sidebar className="md:border-r">
+                <SidebarContent>
+                  <AppSidebar />
+                </SidebarContent>
+              </Sidebar>
+              <SidebarInset>
+                <main className="flex-1 container py-8">{children}</main>
+              </SidebarInset>
+            </div>
+          </div>
+        </SidebarProvider>
         <Toaster />
       </body>
     </html>
