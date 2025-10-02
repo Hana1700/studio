@@ -20,7 +20,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -29,6 +29,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { Contact } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 
 export default function AdminPage() {
@@ -175,90 +181,27 @@ export default function AdminPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Gérer les structures et contacts</CardTitle>
-            <div>
-              <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" onClick={() => setIsStructureDialogOpen(true)}>
-                    <Building className="mr-2 h-4 w-4" />
-                    Ajouter une structure
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[525px]">
-                  <DialogHeader>
-                    <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
-                    <DialogDescription>
-                      Remplissez les détails de la structure et de ses
-                      sous-directions.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-6 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                        Nom
-                      </Label>
-                      <Input
-                        id="name"
-                        placeholder="Nom de la structure"
-                        className="col-span-3"
-                        value={newStructureName}
-                        onChange={(e) => setNewStructureName(e.target.value)}
-                      />
-                    </div>
-                    <Separator />
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-medium">Sous-directions</h3>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleAddSubDepartment}
-                        >
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          Ajouter
-                        </Button>
-                      </div>
-                      <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
-                        {subDepartments.map((sub, index) => (
-                          <div
-                            key={sub.id}
-                            className="flex items-center gap-4 rounded-lg border p-4"
-                          >
-                            <Building className="h-6 w-6 text-primary" />
-                            <div className="flex-1">
-                              <Input
-                                placeholder={`Nom de la sous-direction ${index + 1}`}
-                                className="w-full"
-                                value={sub.name}
-                                onChange={(e) =>
-                                  handleSubDepartmentNameChange(sub.id, e.target.value)
-                                }
-                              />
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleRemoveSubDepartment(sub.id)}
-                              disabled={subDepartments.length <= 1}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={handleCancelStructure}>Annuler</Button>
-                    <Button type="submit" onClick={handleSaveStructure}>Enregistrer</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Ajouter
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => setIsStructureDialogOpen(true)}>
+                  <Building className="mr-2 h-4 w-4" />
+                  <span>Structure</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleAddNewContact}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  <span>Contact</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <Button onClick={handleAddNewContact} className="ml-2">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Ajouter un contact
-              </Button>
-            </div>
           </div>
           <CardDescription>
             Ajoutez, modifiez ou supprimez des structures et des contacts.
@@ -342,6 +285,79 @@ export default function AdminPage() {
         </CardContent>
       </Card>
 
+      <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
+            <DialogDescription>
+              Remplissez les détails de la structure et de ses
+              sous-directions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Nom
+              </Label>
+              <Input
+                id="name"
+                placeholder="Nom de la structure"
+                className="col-span-3"
+                value={newStructureName}
+                onChange={(e) => setNewStructureName(e.target.value)}
+              />
+            </div>
+            <Separator />
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium">Sous-directions</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddSubDepartment}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Ajouter
+                </Button>
+              </div>
+              <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
+                {subDepartments.map((sub, index) => (
+                  <div
+                    key={sub.id}
+                    className="flex items-center gap-4 rounded-lg border p-4"
+                  >
+                    <Building className="h-6 w-6 text-primary" />
+                    <div className="flex-1">
+                      <Input
+                        placeholder={`Nom de la sous-direction ${index + 1}`}
+                        className="w-full"
+                        value={sub.name}
+                        onChange={(e) =>
+                          handleSubDepartmentNameChange(sub.id, e.target.value)
+                        }
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveSubDepartment(sub.id)}
+                      disabled={subDepartments.length <= 1}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelStructure}>Annuler</Button>
+            <Button type="submit" onClick={handleSaveStructure}>Enregistrer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
             <DialogHeader>
@@ -414,5 +430,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
