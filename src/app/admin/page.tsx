@@ -53,7 +53,6 @@ export default function AdminPage() {
     title: '',
     phone: '',
     mobile: '',
-    email: '',
     structureId: '',
     subDepartmentId: '',
   });
@@ -119,7 +118,6 @@ export default function AdminPage() {
         title: '',
         phone: '',
         mobile: '',
-        email: '',
         structureId: '',
         subDepartmentId: '',
     });
@@ -138,7 +136,6 @@ export default function AdminPage() {
         title: contact.title,
         phone: contact.phone,
         mobile: contact.mobile || '',
-        email: contact.email,
         structureId: contact.structureId || '',
         subDepartmentId: contact.subDepartmentId || '',
     });
@@ -382,10 +379,6 @@ export default function AdminPage() {
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="contact-mobile" className="text-right">Numéro 2</Label>
                 <Input id="contact-mobile" value={contactForm.mobile} onChange={(e) => setContactForm({...contactForm, mobile: e.target.value})} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-email" className="text-right">Email</Label>
-                <Input id="contact-email" type="email" value={contactForm.email} onChange={(e) => setContactForm({...contactForm, email: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                  <Label htmlFor="structure" className="text-right">Structure</Label>
