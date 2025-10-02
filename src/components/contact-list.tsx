@@ -111,7 +111,6 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
                 <TableRow>
                   <TableHead>Service</TableHead>
                   <TableHead>Nom</TableHead>
-                  <TableHead>Grade</TableHead>
                   <TableHead>Numéro 1</TableHead>
                   <TableHead>Numéro 2</TableHead>
                   <TableHead>Numéro 3</TableHead>
@@ -131,10 +130,10 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
                         <CellComponent {...cellProps} className="block hover:text-primary">{contact.subDepartmentName}</CellComponent>
                       </TableCell>
                       <TableCell className="font-medium">
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.name}</CellComponent>
-                      </TableCell>
-                      <TableCell>
-                        <CellComponent {...cellProps} className="block">{contact.title}</CellComponent>
+                        <CellComponent {...cellProps} className="block hover:text-primary">
+                          <div>{contact.name}</div>
+                          <div className="text-sm text-muted-foreground">{contact.title}</div>
+                        </CellComponent>
                       </TableCell>
                       <TableCell>
                         <CellComponent {...cellProps} className="block hover:text-primary">{contact.phone}</CellComponent>
