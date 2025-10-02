@@ -28,6 +28,7 @@ import { structures as initialStructures, allContacts as initialContacts } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Contact } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
 export default function AdminPage() {
@@ -173,158 +174,157 @@ export default function AdminPage() {
        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Gérer les contacts</CardTitle>
-            <Button onClick={handleAddNewContact}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Ajouter un contact
-            </Button>
+            <CardTitle>Gérer les structures et contacts</CardTitle>
+            <div>
+              <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" onClick={() => setIsStructureDialogOpen(true)}>
+                    <Building className="mr-2 h-4 w-4" />
+                    Ajouter une structure
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[525px]">
+                  <DialogHeader>
+                    <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
+                    <DialogDescription>
+                      Remplissez les détails de la structure et de ses
+                      sous-directions.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-6 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Nom
+                      </Label>
+                      <Input
+                        id="name"
+                        placeholder="Nom de la structure"
+                        className="col-span-3"
+                        value={newStructureName}
+                        onChange={(e) => setNewStructureName(e.target.value)}
+                      />
+                    </div>
+                    <Separator />
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-medium">Sous-directions</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddSubDepartment}
+                        >
+                          <PlusCircle className="mr-2 h-4 w-4" />
+                          Ajouter
+                        </Button>
+                      </div>
+                      <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
+                        {subDepartments.map((sub, index) => (
+                          <div
+                            key={sub.id}
+                            className="flex items-center gap-4 rounded-lg border p-4"
+                          >
+                            <Building className="h-6 w-6 text-primary" />
+                            <div className="flex-1">
+                              <Input
+                                placeholder={`Nom de la sous-direction ${index + 1}`}
+                                className="w-full"
+                                value={sub.name}
+                                onChange={(e) =>
+                                  handleSubDepartmentNameChange(sub.id, e.target.value)
+                                }
+                              />
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleRemoveSubDepartment(sub.id)}
+                              disabled={subDepartments.length <= 1}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={handleCancelStructure}>Annuler</Button>
+                    <Button type="submit" onClick={handleSaveStructure}>Enregistrer</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Button onClick={handleAddNewContact} className="ml-2">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Ajouter un contact
+              </Button>
+            </div>
           </div>
           <CardDescription>
-            Ajoutez, modifiez ou supprimez des contacts.
+            Ajoutez, modifiez ou supprimez des structures et des contacts.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Téléphone</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contacts.map(contact => (
-                <TableRow key={contact.id}>
-                  <TableCell>
-                    <div className="font-medium">{contact.name}</div>
-                    <div className="text-sm text-muted-foreground">{contact.title}</div>
-                  </TableCell>
-                  <TableCell>{contact.subDepartmentName}</TableCell>
-                  <TableCell>{contact.phone}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(contact.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+           <Accordion type="single" collapsible className="w-full">
+            {structures.map((structure) => (
+              <AccordionItem value={`structure-${structure.id}`} key={structure.id}>
+                <AccordionTrigger>
+                    <div className='flex justify-between w-full items-center'>
+                         <p className="font-medium">{structure.name}</p>
+                         <div className='flex items-center'>
+                            <p className="text-sm text-muted-foreground mr-4">
+                                {structure.subDepartments.length} sous-direction(s)
+                            </p>
+                            {/* Actions for structure can go here */}
+                         </div>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <div className='pl-4 border-l'>
+                        <h4 className='font-medium mb-2'>Contacts</h4>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Nom</TableHead>
+                                    <TableHead>Service</TableHead>
+                                    <TableHead>Téléphone</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                             <TableBody>
+                                {contacts.filter(c => c.structureId === structure.id).map(contact => (
+                                    <TableRow key={contact.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{contact.name}</div>
+                                        <div className="text-sm text-muted-foreground">{contact.title}</div>
+                                    </TableCell>
+                                    <TableCell>{contact.subDepartmentName}</TableCell>
+                                    <TableCell>{contact.phone}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
+                                        <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(contact.id)}>
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                        </Button>
+                                    </TableCell>
+                                    </TableRow>
+                                ))}
+                                {contacts.filter(c => c.structureId === structure.id).length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center text-muted-foreground">Aucun contact dans cette structure.</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
 
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Gérer les structures</CardTitle>
-             <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => setIsStructureDialogOpen(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Ajouter une structure
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[525px]">
-                <DialogHeader>
-                  <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
-                  <DialogDescription>
-                    Remplissez les détails de la structure et de ses
-                    sous-directions.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-6 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Nom
-                    </Label>
-                    <Input
-                      id="name"
-                      placeholder="Nom de la structure"
-                      className="col-span-3"
-                      value={newStructureName}
-                      onChange={(e) => setNewStructureName(e.target.value)}
-                    />
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-medium">Sous-directions</h3>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAddSubDepartment}
-                      >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Ajouter
-                      </Button>
-                    </div>
-                    <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
-                      {subDepartments.map((sub, index) => (
-                        <div
-                          key={sub.id}
-                          className="flex items-center gap-4 rounded-lg border p-4"
-                        >
-                          <Building className="h-6 w-6 text-primary" />
-                          <div className="flex-1">
-                            <Input
-                              placeholder={`Nom de la sous-direction ${index + 1}`}
-                              className="w-full"
-                              value={sub.name}
-                              onChange={(e) =>
-                                handleSubDepartmentNameChange(sub.id, e.target.value)
-                              }
-                            />
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveSubDepartment(sub.id)}
-                            disabled={subDepartments.length <= 1}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={handleCancelStructure}>Annuler</Button>
-                  <Button type="submit" onClick={handleSaveStructure}>Enregistrer</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-           <CardDescription>
-            Ajoutez ou modifiez des structures et sous-directions.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-           <div className="overflow-hidden rounded-lg border">
-            <ul className="divide-y">
-              {structures.map((structure) => (
-                <li key={structure.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{structure.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {structure.subDepartments.length} sous-direction(s)
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
 
       <Card className="w-full">
         <CardHeader>
@@ -414,3 +414,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
