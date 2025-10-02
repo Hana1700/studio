@@ -12,7 +12,7 @@ export const structures: Structure[] = [
     subDepartments: [
       {
         id: 'presidence',
-        name: 'Présidence',
+        name: 'Sous-direction de...',
         icon: Building,
         contacts: [
           {
@@ -32,6 +32,18 @@ export const structures: Structure[] = [
           },
         ],
       },
+      {
+        id: 'sous-direction-2',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
+      {
+        id: 'sous-direction-3',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
     ],
   },
   {
@@ -42,7 +54,7 @@ export const structures: Structure[] = [
     subDepartments: [
       {
         id: 'reseau',
-        name: 'Réseau',
+        name: 'Sous-direction de...',
         icon: Building,
         contacts: [
           {
@@ -64,7 +76,7 @@ export const structures: Structure[] = [
       },
       {
         id: 'developpement',
-        name: 'Développement',
+        name: 'Sous-direction de...',
         icon: Building,
         contacts: [
           {
@@ -86,7 +98,7 @@ export const structures: Structure[] = [
       },
       {
         id: 'support-technique',
-        name: 'Support Technique',
+        name: 'Sous-direction de...',
         icon: Building,
         contacts: [
           {
@@ -109,7 +121,7 @@ export const structures: Structure[] = [
     subDepartments: [
       {
         id: 'recrutement',
-        name: 'Recrutement',
+        name: 'Sous-direction de...',
         icon: Building,
         contacts: [
           {
@@ -121,6 +133,18 @@ export const structures: Structure[] = [
           },
         ],
       },
+       {
+        id: 'sous-direction-rh-2',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
+      {
+        id: 'sous-direction-rh-3',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
     ],
   },
   {
@@ -128,7 +152,26 @@ export const structures: Structure[] = [
     name: 'Direction de ....',
     icon: Building,
     description: 'Promotion de l\'image et des produits de l\'entreprise.',
-    subDepartments: [],
+    subDepartments: [
+      {
+        id: 'sous-direction-mkt-1',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
+      {
+        id: 'sous-direction-mkt-2',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
+      {
+        id: 'sous-direction-mkt-3',
+        name: 'Sous-direction de...',
+        icon: Building,
+        contacts: [],
+      },
+    ],
   },
 ];
 
