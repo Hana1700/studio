@@ -26,7 +26,7 @@ export const structures: Structure[] = [
           {
             id: 'secreteriat-presidence',
             name: 'Secrétariat',
-            title: 'Secrétariat',
+            title: 'Secrétariat du Président',
             phone: '01 23 45 67 91',
             email: 'secretariat.presidence@example.com',
           },
@@ -67,7 +67,7 @@ export const structures: Structure[] = [
           {
             id: '3',
             name: 'Paul Bernard',
-            title: 'Administrateur Réseau',
+            title: 'Chef de sous-direction',
             phone: '01 34 56 78 11',
             email: 'p.bernard@example.com',
           },
@@ -96,7 +96,7 @@ export const structures: Structure[] = [
           {
             id: '5',
             name: 'Marc Petit',
-            title: 'Développeur Full-Stack',
+            title: 'Chef de sous-direction',
             phone: '01 34 56 78 21',
             mobile: '06 34 56 78 90',
             email: 'm.petit@example.com',
@@ -125,7 +125,7 @@ export const structures: Structure[] = [
           {
             id: '7',
             name: 'Alice Moreau',
-            title: 'Responsable Support',
+            title: 'Chef de sous-direction',
             phone: '01 34 56 78 31',
             mobile: '06 45 67 89 01',
             email: 'a.moreau@example.com',
@@ -155,7 +155,7 @@ export const structures: Structure[] = [
           {
             id: '8',
             name: 'Thomas Leroy',
-            title: 'Chargé de Recrutement',
+            title: 'Chef de sous-direction',
             phone: '01 45 67 89 01',
             email: 't.leroy@example.com',
           },
