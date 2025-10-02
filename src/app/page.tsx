@@ -1,23 +1,22 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookUser } from "lucide-react";
-
+import { AppLogo } from '@/components/icons';
+import { SearchBar } from '@/components/search-bar';
 
 export default function Home() {
   return (
-    <div className="flex h-full items-center justify-center">
-        <Card className="w-full max-w-md text-center">
-            <CardHeader>
-                <div className="flex justify-center mb-4">
-                    <BookUser className="h-16 w-16 text-primary" />
-                </div>
-                <CardTitle className="font-headline text-2xl">Bienvenue dans l'annuaire</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground">
-                    Utilisez le menu sur la gauche pour naviguer entre les différentes structures et trouver les contacts que vous cherchez.
-                </p>
-            </CardContent>
-        </Card>
+    <div className="flex h-full flex-col items-center justify-center space-y-8 text-center">
+      <div className="flex items-center space-x-4">
+        <AppLogo className="h-20 w-20 text-primary" />
+        <h1 className="font-headline text-5xl font-bold tracking-tight">
+          Annuaire
+        </h1>
+      </div>
+      <p className="max-w-xl text-lg text-muted-foreground">
+        Recherchez rapidement des contacts, des services ou des structures au
+        sein de l&apos;entreprise.
+      </p>
+      <div className="w-full max-w-2xl px-4">
+        <SearchBar />
+      </div>
     </div>
   );
 }
