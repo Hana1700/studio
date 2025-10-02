@@ -7,7 +7,7 @@ import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, 
 import { AppSidebar } from '@/components/app-sidebar';
 
 export const metadata: Metadata = {
-  title: 'Structure Contact Central',
+  title: 'Annuaire téléphonique de......',
   description: 'Centralisez et organisez les coordonnées téléphoniques de l’entreprise.',
 };
 

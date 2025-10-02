@@ -18,7 +18,7 @@ export function AppHeader() {
           <Link href="/" className="flex items-center space-x-2">
             <AppLogo className="h-6 w-6 text-primary" />
             <span className="hidden font-bold font-headline sm:inline-block">
-              Structure Contact Central
+              Annuaire téléphonique de......
             </span>
           </Link>
           <nav className="flex items-center">
