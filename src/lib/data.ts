@@ -6,7 +6,7 @@ import {
 export const structures: Structure[] = [
   {
     id: 'direction-generale',
-    name: 'Direction Générale',
+    name: 'Direction de ....',
     icon: Building,
     description: 'Management et direction de l\'entreprise.',
     subDepartments: [
@@ -36,7 +36,7 @@ export const structures: Structure[] = [
   },
   {
     id: 'departement-informatique',
-    name: 'Département Informatique',
+    name: 'Direction de ....',
     icon: Building,
     description: 'Gestion des systèmes d\'information et technologies.',
     subDepartments: [
@@ -103,7 +103,7 @@ export const structures: Structure[] = [
   },
   {
     id: 'ressources-humaines',
-    name: 'Ressources Humaines',
+    name: 'Direction de ....',
     icon: Building,
     description: 'Gestion du personnel et des relations sociales.',
     subDepartments: [
@@ -125,7 +125,7 @@ export const structures: Structure[] = [
   },
   {
     id: 'marketing',
-    name: 'Marketing & Communication',
+    name: 'Direction de ....',
     icon: Building,
     description: 'Promotion de l\'image et des produits de l\'entreprise.',
     subDepartments: [],
