@@ -17,7 +17,8 @@ export default function SearchPage() {
           contact.phone.includes(query) ||
           contact.mobile?.includes(query) ||
           contact.email.toLowerCase().includes(query.toLowerCase()) ||
-          contact.structureName.toLowerCase().includes(query.toLowerCase())
+          contact.structureName.toLowerCase().includes(query.toLowerCase()) ||
+          contact.subDepartmentName?.toLowerCase().includes(query.toLowerCase())
       )
     : [];
 

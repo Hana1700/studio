@@ -10,6 +10,7 @@ export interface Contact {
   structureId?: string;
   subDepartmentId?: string;
   structureName?: string;
+  subDepartmentName?: string;
 }
 
 export interface SubDepartment {

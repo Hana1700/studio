@@ -37,6 +37,11 @@ export default function SubDepartmentPage({
     },
   ];
 
+  const contactsWithSubDepartment = subDepartment.contacts.map(contact => ({
+    ...contact,
+    subDepartmentName: subDepartment.name,
+  }));
+
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
@@ -68,7 +73,7 @@ export default function SubDepartmentPage({
         </Dialog>
       </div>
 
-      <ContactList contacts={subDepartment.contacts} />
+      <ContactList contacts={contactsWithSubDepartment} />
     </div>
   );
 }

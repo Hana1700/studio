@@ -18,13 +18,14 @@ import {
   Briefcase,
   Mail,
   Search,
+  Building,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import Link from 'next/link';
 
-function ContactCard({ contact }: { contact: Contact & { structureId?: string; subDepartmentId?: string } }) {
+function ContactCard({ contact }: { contact: Contact & { structureId?: string; subDepartmentId?: string; subDepartmentName?: string } }) {
   const contactLink = `/contact/${contact.id}`;
 
   return (
@@ -61,7 +62,7 @@ function ContactCard({ contact }: { contact: Contact & { structureId?: string; s
   );
 }
 
-export function ContactList({ contacts }: { contacts: (Contact & { structureId?: string, subDepartmentId?: string })[] }) {
+export function ContactList({ contacts }: { contacts: (Contact & { structureId?: string, subDepartmentId?: string, subDepartmentName?: string })[] }) {
   const [search, setSearch] = useState('');
 
   const filteredContacts =
@@ -70,7 +71,8 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
         contact.name.toLowerCase().includes(search.toLowerCase()) ||
         contact.title.toLowerCase().includes(search.toLowerCase()) ||
         contact.phone.includes(search) ||
-        contact.mobile?.includes(search)
+        contact.mobile?.includes(search) ||
+        contact.subDepartmentName?.toLowerCase().includes(search.toLowerCase())
     ) || [];
 
   if (contacts.length === 0) {
@@ -86,7 +88,7 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Filtrer par nom, poste, numéro..."
+          placeholder="Filtrer par service, nom, poste..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full max-w-sm pl-9"
@@ -107,6 +109,7 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Service</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead>Grade</TableHead>
                   <TableHead>Numéro 1</TableHead>
@@ -124,6 +127,9 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
 
                   return (
                     <TableRow key={contact.id} className={'cursor-pointer'}>
+                       <TableCell>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.subDepartmentName}</CellComponent>
+                      </TableCell>
                       <TableCell className="font-medium">
                         <CellComponent {...cellProps} className="block hover:text-primary">{contact.name}</CellComponent>
                       </TableCell>
