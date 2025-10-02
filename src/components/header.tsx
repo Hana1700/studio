@@ -10,17 +10,17 @@ export function AppHeader() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex items-center">
           <SidebarTrigger className="md:hidden mr-2" />
+          <div className="w-full max-w-sm">
+            <SearchBar />
+          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-end space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <AppLogo className="h-6 w-6 text-primary" />
             <span className="hidden font-bold font-headline sm:inline-block">
               Structure Contact Central
             </span>
           </Link>
-        </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <SearchBar />
-          </div>
           <nav className="flex items-center">
             <Button variant="ghost" asChild>
               <Link href="/admin">Admin</Link>
