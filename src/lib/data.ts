@@ -208,6 +208,94 @@ export const structures: Structure[] = [
       },
     ],
   },
+    {
+    id: 'direction-5',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir5-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir5-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir5-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-6',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir6-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir6-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir6-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-7',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir7-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir7-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir7-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-8',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir8-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir8-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir8-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-9',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir9-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir9-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir9-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-10',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir10-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir10-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir10-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-11',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir11-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir11-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir11-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
+  {
+    id: 'direction-12',
+    name: 'Direction de ....',
+    icon: Building,
+    description: 'Nouvelle direction',
+    subDepartments: [
+      { id: 'dir12-sd1', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir12-sd2', name: 'Sous-direction de...', icon: Building, contacts: [] },
+      { id: 'dir12-sd3', name: 'Sous-direction de...', icon: Building, contacts: [] },
+    ],
+  },
 ];
 
 export const allContacts = structures.flatMap((structure) =>
