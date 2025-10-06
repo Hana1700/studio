@@ -35,7 +35,7 @@ export default function RootLayout({
           <div className="relative flex min-h-screen flex-col">
             <AppHeader />
             <div className="flex flex-1">
-              <Sidebar className="md:border-r">
+              <Sidebar>
                 <SidebarContent>
                   <AppSidebar />
                 </SidebarContent>
