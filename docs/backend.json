@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Structure": {
+      "title": "Structure",
+      "description": "Represents a main department or division in the organization.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the structure."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the structure."
+        }
+      },
+      "required": ["name"]
+    },
+    "SubDepartment": {
+      "title": "SubDepartment",
+      "description": "Represents a sub-department within a main structure.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the sub-department."
+        },
+        "structureId": {
+          "type": "string",
+          "description": "The ID of the parent structure."
+        }
+      },
+      "required": ["name", "structureId"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "description": "Represents a contact person.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The full name of the contact."
+        },
+        "title": {
+          "type": "string",
+          "description": "The job title of the contact."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The primary phone number."
+        },
+        "mobile": {
+          "type": "string",
+          "description": "The secondary or mobile phone number."
+        },
+        "structureId": {
+          "type": "string",
+          "description": "The ID of the structure this contact belongs to."
+        },
+        "subDepartmentId": {
+          "type": "string",
+          "description": "The ID of the sub-department this contact belongs to."
+        }
+      },
+      "required": ["name", "title", "phone", "structureId"]
+    }
+  },
+  "auth": {
+    "providers": ["anonymous"]
+  },
+  "firestore": {
+    "/structures/{structureId}": {
+      "schema": {
+        "$ref": "#/entities/Structure"
+      },
+      "description": "Stores all the main structures/departments."
+    },
+    "/subDepartments/{subDepartmentId}": {
+      "schema": {
+        "$ref": "#/entities/SubDepartment"
+      },
+      "description": "Stores all sub-departments, linked to a parent structure."
+    },
+    "/contacts/{contactId}": {
+      "schema": {
+        "$ref": "#/entities/Contact"
+      },
+      "description": "Stores all contact information."
+    }
+  }
+}
