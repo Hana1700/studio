@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: 'Annuaire téléphonique de......',
@@ -31,19 +32,21 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <SidebarProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <AppHeader />
-            <div className="flex flex-1">
-              <Sidebar side="left" collapsible="offcanvas">
-                <SidebarContent>
-                  <AppSidebar />
-                </SidebarContent>
-              </Sidebar>
-              <main className="flex-1 container py-8">{children}</main>
+        <AuthProvider>
+          <SidebarProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <AppHeader />
+              <div className="flex flex-1">
+                <Sidebar side="left" collapsible="offcanvas">
+                  <SidebarContent>
+                    <AppSidebar />
+                  </SidebarContent>
+                </Sidebar>
+                <main className="flex-1 container py-8">{children}</main>
+              </div>
             </div>
-          </div>
-        </SidebarProvider>
+          </SidebarProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

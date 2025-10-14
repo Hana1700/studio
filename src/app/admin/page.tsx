@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
 import {
   Card,
@@ -19,7 +22,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -38,6 +41,15 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 
 export default function AdminPage() {
+  const { isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
   const [structures, setStructures] = useState(initialStructures);
   const [contacts, setContacts] = useState(initialContacts);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
@@ -62,6 +74,9 @@ export default function AdminPage() {
     subDepartmentId: '',
   });
 
+  if (!isAuthenticated) {
+    return null; 
+  }
 
   const handleAddSubDepartment = () => {
     setSubDepartments([
@@ -208,6 +223,10 @@ export default function AdminPage() {
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Administrateur
         </h1>
+        <Button variant="outline" onClick={logout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Déconnexion
+        </Button>
       </div>
 
        <Card>

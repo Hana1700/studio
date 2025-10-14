@@ -30,7 +30,7 @@ export function AppHeader() {
           </span>
           <nav className="flex items-center">
             <Button variant="ghost" asChild>
-              <Link href="/admin">Admin</Link>
+              <Link href="/login">Admin</Link>
             </Button>
           </nav>
         </div>
