@@ -370,23 +370,6 @@ export default function AdminPage() {
         </CardContent>
       </Card>
 
-
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
-            <AlertCircle className="w-6 h-6 text-primary" />
-            Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Cette section est réservée aux administrateurs. Une authentification
-            est requise pour ajouter, modifier ou supprimer des contacts et des
-            structures. Les ajouts effectués ici sont temporaires et seront perdus au rechargement de la page.
-          </p>
-        </CardContent>
-      </Card>
-
       <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
