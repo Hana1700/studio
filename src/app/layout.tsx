@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
-import { AuthProvider } from '@/hooks/use-auth';
+import { AuthProvider } from '@/hooks/use-auth.tsx';
 
 export const metadata: Metadata = {
   title: 'Annuaire téléphonique de......',

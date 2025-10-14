@@ -53,9 +53,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   
   useEffect(() => {
-    const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
-    if (!isAuth && pathname === '/admin') {
-      router.push('/login');
+    try {
+        const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
+        if (!isAuth && pathname === '/admin') {
+          router.push('/login');
+        }
+    } catch(e) {
+        if (pathname === '/admin') {
+          router.push('/login');
+        }
     }
   }, [pathname, router]);
 

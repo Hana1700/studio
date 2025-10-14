@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth.tsx';
 import { useState } from 'react';
 import {
   Card,
@@ -552,7 +552,7 @@ export default function AdminPage() {
                   >
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Sélectionner une sous-direction" />
-                    </SelectTrigger>
+                    </Trigger>
                     <SelectContent>
                       {availableSubDepartments?.map((sd) => (
                         <SelectItem key={sd.id} value={sd.id}>{sd.name}</SelectItem>
