@@ -3,7 +3,7 @@ import { AppHeader } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 
 export const metadata: Metadata = {
@@ -35,14 +35,12 @@ export default function RootLayout({
           <div className="relative flex min-h-screen flex-col">
             <AppHeader />
             <div className="flex flex-1">
-              <Sidebar>
+              <Sidebar side="left" collapsible="offcanvas">
                 <SidebarContent>
                   <AppSidebar />
                 </SidebarContent>
               </Sidebar>
-              <SidebarInset>
-                <main className="flex-1 container py-8">{children}</main>
-              </SidebarInset>
+              <main className="flex-1 container py-8">{children}</main>
             </div>
           </div>
         </SidebarProvider>

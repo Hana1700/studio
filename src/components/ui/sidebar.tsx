@@ -175,7 +175,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -191,6 +191,31 @@ const Sidebar = React.forwardRef<
         </div>
       )
     }
+
+    if (collapsible === 'offcanvas') {
+      const isActuallyMobile = useIsMobile();
+      const sheetOpen = isActuallyMobile ? openMobile : open;
+      const setSheetOpen = isActuallyMobile ? setOpenMobile : setOpen;
+
+      return (
+         <Sheet open={sheetOpen} onOpenChange={setSheetOpen} {...props}>
+          <SheetContent
+            data-sidebar="sidebar"
+            data-mobile={isActuallyMobile}
+            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            style={
+              {
+                "--sidebar-width": isActuallyMobile ? SIDEBAR_WIDTH_MOBILE : SIDEBAR_WIDTH,
+              } as React.CSSProperties
+            }
+            side={side}
+          >
+            <div className="flex h-full w-full flex-col">{children}</div>
+          </SheetContent>
+        </Sheet>
+      )
+    }
+
 
     if (isMobile) {
       return (
