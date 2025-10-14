@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -20,7 +19,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -42,7 +41,12 @@ export default function AdminPage() {
   const [contacts, setContacts] = useState(initialContacts);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
+  
   const [newStructureName, setNewStructureName] = useState('');
+  const [newSubDepartmentName, setNewSubDepartmentName] = useState('');
+  const [parentStructureId, setParentStructureId] = useState('');
+
   const [subDepartments, setSubDepartments] = useState([{ id: 1, name: '' }]);
 
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -162,6 +166,37 @@ export default function AdminPage() {
     resetContactForm();
     setIsContactDialogOpen(false);
   };
+  
+  const handleSaveSubDepartment = () => {
+    if (!parentStructureId || !newSubDepartmentName.trim()) return;
+
+    const newSubDept = {
+      id: newSubDepartmentName.toLowerCase().replace(/\s/g, '-'),
+      name: newSubDepartmentName,
+      icon: Building,
+      contacts: [],
+    };
+
+    setStructures(structures.map(s => 
+      s.id === parentStructureId 
+        ? { ...s, subDepartments: [...s.subDepartments, newSubDept] }
+        : s
+    ));
+
+    resetSubDepartmentForm();
+    setIsSubDepartmentDialogOpen(false);
+  };
+
+  const resetSubDepartmentForm = () => {
+    setNewSubDepartmentName('');
+    setParentStructureId('');
+  };
+
+  const handleCancelSubDepartment = () => {
+    resetSubDepartmentForm();
+    setIsSubDepartmentDialogOpen(false);
+  };
+
 
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
 
@@ -191,6 +226,10 @@ export default function AdminPage() {
                 <DropdownMenuItem onSelect={() => setIsStructureDialogOpen(true)}>
                   <Building className="mr-2 h-4 w-4" />
                   <span>Structure</span>
+                </DropdownMenuItem>
+                 <DropdownMenuItem onSelect={() => setIsSubDepartmentDialogOpen(true)}>
+                  <Library className="mr-2 h-4 w-4" />
+                  <span>Sous-direction</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={handleAddNewContact}>
                   <UserPlus className="mr-2 h-4 w-4" />
@@ -350,6 +389,50 @@ export default function AdminPage() {
           <DialogFooter>
             <Button variant="outline" onClick={handleCancelStructure}>Annuler</Button>
             <Button type="submit" onClick={handleSaveStructure}>Enregistrer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isSubDepartmentDialogOpen} onOpenChange={setIsSubDepartmentDialogOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Ajouter une sous-direction</DialogTitle>
+            <DialogDescription>
+              Sélectionnez une structure parente et nommez la nouvelle sous-direction.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="parent-structure" className="text-right">
+                Structure
+              </Label>
+              <Select value={parentStructureId} onValueChange={setParentStructureId}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Sélectionner une structure" />
+                </SelectTrigger>
+                <SelectContent>
+                  {structures.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="subdepartment-name" className="text-right">
+                Nom
+              </Label>
+              <Input
+                id="subdepartment-name"
+                placeholder="Nom de la sous-direction"
+                className="col-span-3"
+                value={newSubDepartmentName}
+                onChange={(e) => setNewSubDepartmentName(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelSubDepartment}>Annuler</Button>
+            <Button onClick={handleSaveSubDepartment}>Enregistrer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
