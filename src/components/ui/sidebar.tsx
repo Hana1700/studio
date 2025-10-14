@@ -4,13 +4,14 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -210,6 +211,8 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
+            <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
+            <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
@@ -231,6 +234,8 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
+            <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
+            <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
