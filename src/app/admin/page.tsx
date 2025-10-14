@@ -19,7 +19,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 
 export default function AdminPage() {
@@ -261,7 +262,48 @@ export default function AdminPage() {
                 <AccordionContent>
                     <div className='pl-4 border-l'>
                         <h4 className='font-medium mb-2'>Contacts</h4>
-                        <Table>
+                        {/* Mobile view */}
+                        <div className="grid grid-cols-1 gap-4 md:hidden">
+                           {contacts.filter(c => c.structureId === structure.id).map(contact => (
+                            <Card key={contact.id}>
+                              <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                <Avatar className='h-10 w-10'>
+                                  <AvatarFallback>
+                                    {contact.name.split(' ').map((n) => n[0]).join('')}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <CardTitle className="text-base font-medium">{contact.name}</CardTitle>
+                                  <CardDescription>{contact.title}</CardDescription>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="space-y-2 text-sm pt-2">
+                                {contact.subDepartmentName && <p><span className="font-semibold">Service:</span> {contact.subDepartmentName}</p>}
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <span>{contact.phone}</span>
+                                </div>
+                                {contact.mobile && (
+                                  <div className="flex items-center gap-2">
+                                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                                    <span>{contact.mobile}</span>
+                                  </div>
+                                )}
+                              </CardContent>
+                              <div className="flex justify-end p-2 pt-0">
+                                <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(contact.id)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+
+                        {/* Desktop view */}
+                        <Table className="hidden md:table">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Nom</TableHead>
@@ -296,6 +338,9 @@ export default function AdminPage() {
                                 )}
                             </TableBody>
                         </Table>
+                         {contacts.filter(c => c.structureId === structure.id).length === 0 && (
+                            <p className="text-sm text-center text-muted-foreground py-4 md:hidden">Aucun contact dans cette structure.</p>
+                        )}
                     </div>
                 </AccordionContent>
               </AccordionItem>
