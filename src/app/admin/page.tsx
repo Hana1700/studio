@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth.tsx';
-import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -44,8 +43,8 @@ export default function AdminPage() {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
   
-  const [structures, setStructures] = useState(initialStructures);
-  const [contacts, setContacts] = useState(initialContacts);
+  const [structures, setStructures] = useState([...initialStructures]);
+  const [contacts, setContacts] = useState([...initialContacts]);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
@@ -69,7 +68,9 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    // Si l'état d'authentification est connu et qu'il est faux, on redirige.
+    // If auth state is known and it is false, redirect.
+    // Using `isAuthenticated === false` is important to avoid redirecting
+    // on the initial render when the state is not yet known.
     if (isAuthenticated === false) {
       router.push('/login');
     }
@@ -212,8 +213,8 @@ export default function AdminPage() {
 
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
 
-  // On ne rend rien tant qu'on ne sait pas si l'utilisateur est authentifié.
-  // Cela évite un flash de contenu et résout les problèmes de rendu.
+  // We render nothing until we know the auth status, to prevent flash of content
+  // and hydration errors. The useEffect above will handle the redirect.
   if (!isAuthenticated) {
     return null;
   }
@@ -553,7 +554,7 @@ export default function AdminPage() {
                   >
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Sélectionner une sous-direction" />
-                    </Trigger>
+                    </SelectTrigger>
                     <SelectContent>
                       {availableSubDepartments?.map((sd) => (
                         <SelectItem key={sd.id} value={sd.id}>{sd.name}</SelectItem>
