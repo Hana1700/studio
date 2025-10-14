@@ -43,13 +43,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 export default function AdminPage() {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
-
+  
   const [structures, setStructures] = useState(initialStructures);
   const [contacts, setContacts] = useState(initialContacts);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
@@ -74,9 +68,12 @@ export default function AdminPage() {
     subDepartmentId: '',
   });
 
-  if (!isAuthenticated) {
-    return null; 
-  }
+  useEffect(() => {
+    // Si l'état d'authentification est connu et qu'il est faux, on redirige.
+    if (isAuthenticated === false) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleAddSubDepartment = () => {
     setSubDepartments([
@@ -213,9 +210,13 @@ export default function AdminPage() {
     setIsSubDepartmentDialogOpen(false);
   };
 
-
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
 
+  // On ne rend rien tant qu'on ne sait pas si l'utilisateur est authentifié.
+  // Cela évite un flash de contenu et résout les problèmes de rendu.
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="space-y-8">
