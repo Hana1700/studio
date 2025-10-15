@@ -1,6 +1,7 @@
 
 
 
+
 "use client"
 
 import * as React from "react"
@@ -223,11 +224,11 @@ const Sidebar = React.forwardRef<
 Sidebar.displayName = "Sidebar"
 
 const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
+  HTMLButtonElement,
+  Omit<React.ComponentProps<typeof Button>, "asChild">
 >((props, ref) => {
-  const { isMobile, toggleSidebar, setOpenMobile } = useSidebar();
-  
+  const { isMobile, toggleSidebar } = useSidebar();
+
   const trigger = (
     <Button
       ref={ref}
@@ -243,7 +244,7 @@ const SidebarTrigger = React.forwardRef<
 
   if (isMobile) {
     return (
-       <SheetPrimitiveTrigger asChild onClick={() => setOpenMobile(true)}>
+       <SheetPrimitiveTrigger asChild>
         {trigger}
       </SheetPrimitiveTrigger>
     )
@@ -251,6 +252,7 @@ const SidebarTrigger = React.forwardRef<
 
   return trigger;
 });
+
 SidebarTrigger.displayName = "SidebarTrigger";
 
 const SidebarRail = React.forwardRef<
@@ -552,23 +554,23 @@ const SidebarMenuButton = React.forwardRef<
     }
 
     if (!open) {
-      const button = (
-        <Comp
-          ref={ref}
-          data-sidebar="menu-button"
-          data-size={size}
-          data-active={isActive}
-          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-          {...props}
-        >
-          {icon}
-          <span className="sr-only">{buttonContent}</span>
-        </Comp>
-      );
-      
       return (
         <Tooltip>
-          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipTrigger asChild>
+             <Comp
+              ref={ref}
+              data-sidebar="menu-button"
+              data-size={size}
+              data-active={isActive}
+              className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+              {...props}
+            >
+              {icon}
+               <span className="sr-only">
+                {buttonContent}
+              </span>
+            </Comp>
+          </TooltipTrigger>
           {buttonContent ? (
             <TooltipContent side="right" align="center">
                 {buttonContent}
@@ -763,5 +765,7 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
 
     
