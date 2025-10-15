@@ -223,32 +223,44 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { isMobile, toggleSidebar } = useSidebar()
-  const Trigger = isMobile ? SheetPrimitiveTrigger : "button"
-  const Comp = isMobile ? Slot : "button"
+  const { isMobile, toggleSidebar } = useSidebar();
 
-  return (
-    <Trigger asChild={isMobile}>
+  if (isMobile) {
+    return (
+      <SheetPrimitiveTrigger asChild>
         <Button
           ref={ref}
           data-sidebar="trigger"
           variant="ghost"
           size="icon"
           className={cn("sm:flex", className)}
-          onClick={(event) => {
-            onClick?.(event)
-            if (!isMobile) {
-              toggleSidebar()
-            }
-          }}
           {...props}
         >
           <PanelLeft />
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
-    </Trigger>
-  )
-})
+      </SheetPrimitiveTrigger>
+    );
+  }
+
+  return (
+    <Button
+      ref={ref}
+      data-sidebar="trigger"
+      variant="ghost"
+      size="icon"
+      className={cn("sm:flex", className)}
+      onClick={(event) => {
+        onClick?.(event);
+        toggleSidebar();
+      }}
+      {...props}
+    >
+      <PanelLeft />
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  );
+});
 SidebarTrigger.displayName = "SidebarTrigger"
 
 const SidebarRail = React.forwardRef<
@@ -727,3 +739,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
