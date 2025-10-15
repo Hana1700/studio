@@ -5,6 +5,7 @@
 
 
 
+
 "use client"
 
 import * as React from "react"
@@ -561,19 +562,7 @@ const SidebarMenuButton = React.forwardRef<
     }
     
     if (!open) {
-      return (
-            <Comp
-              ref={ref}
-              data-sidebar="menu-button"
-              data-size={size}
-              data-active={isActive}
-              className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-              {...props}
-            >
-                {icon}
-                <span className="sr-only">{buttonContent}</span>
-            </Comp>
-      )
+      return null;
     }
 
     return (
