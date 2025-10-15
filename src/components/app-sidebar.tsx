@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -57,10 +58,8 @@ export function AppSidebar() {
                     )}
                   >
                     <Link href={`/structure/${structure.id}`}>
-                      <div className="flex items-center gap-2">
-                        <structure.icon className="h-5 w-5 shrink-0 text-primary" />
-                        <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
-                      </div>
+                      <structure.icon className="h-5 w-5 shrink-0 text-primary" />
+                      <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
                     </Link>
                   </SidebarMenuButton>
                 </AccordionTrigger>

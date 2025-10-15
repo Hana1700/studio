@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import * as React from "react"
@@ -224,9 +225,9 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >((props, ref) => {
-  const { isMobile, toggleSidebar, openMobile } = useSidebar();
+  const { isMobile, toggleSidebar } = useSidebar();
   
-  if(isMobile) {
+  if (isMobile) {
     return (
        <SheetPrimitiveTrigger asChild>
         <Button
@@ -572,10 +573,8 @@ const SidebarMenuButton = React.forwardRef<
               )}
               {...props}
             >
-              <div>
-                {icon}
-                <span className="sr-only">{buttonContent}</span>
-              </div>
+              {icon}
+              <span className="sr-only">{buttonContent}</span>
             </Comp>
           </TooltipTrigger>
           {buttonContent ? (
