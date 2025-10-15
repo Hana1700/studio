@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { open } = useSidebar();
 
   const getActiveStructure = () => {
     const parts = pathname.split('/');
@@ -28,8 +30,8 @@ export function AppSidebar() {
   return (
     <div className="space-y-4 py-4">
       <div className="px-3 py-2">
-        <h2 className="mb-2 px-4 font-headline text-lg font-semibold tracking-tight">
-          Structures
+        <h2 className={cn("mb-2 px-4 font-headline text-lg font-semibold tracking-tight", !open && "text-center")}>
+          {open ? 'Structures' : 'S'}
         </h2>
         <Accordion type="single" collapsible defaultValue={activeStructureId ? `item-${activeStructureId}` : undefined}>
           {structures.map((structure) => {
@@ -42,8 +44,8 @@ export function AppSidebar() {
                 )}
               >
                 <Link href={`/structure/${structure.id}`} className="flex items-center w-full">
-                  <structure.icon className="mr-3 h-5 w-5 text-primary" />
-                  {structure.name}
+                  <structure.icon className="mr-3 h-5 w-5 shrink-0 text-primary" />
+                  <span className={cn(!open && "hidden")}>{structure.name}</span>
                 </Link>
               </AccordionTrigger>
               <AccordionContent>
