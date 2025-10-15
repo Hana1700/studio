@@ -214,8 +214,6 @@ const Sidebar = React.forwardRef<
         )}
         {...props}
       >
-        <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
-        <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
         <div className="flex h-full w-full flex-col">{children}</div>
       </div>
     )
@@ -237,7 +235,7 @@ const SidebarTrigger = React.forwardRef<
           data-sidebar="trigger"
           variant="ghost"
           size="icon"
-          className={cn("h-8 w-8", className)}
+          className={cn("h-8 w-8 sm:hidden", className)}
           onClick={(event) => {
             onClick?.(event)
           }}
@@ -256,7 +254,7 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-8 w-8", className)}
+      className={cn("h-8 w-8 hidden sm:flex", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
