@@ -3,7 +3,7 @@ import { AppHeader } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AuthProvider } from '@/hooks/use-auth.tsx';
 

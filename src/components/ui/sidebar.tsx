@@ -183,7 +183,7 @@ const Sidebar = React.forwardRef<
             ref={ref}
             data-sidebar="sidebar"
             data-mobile="true"
-            className={cn("w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden", className)}
+            className={cn("w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground", className)}
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -191,9 +191,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
-            <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
-            <div className="flex h-full w-full flex-col">{children}</div>
+            {children}
           </SheetContent>
         </Sheet>
       )
@@ -214,7 +212,7 @@ const Sidebar = React.forwardRef<
         )}
         {...props}
       >
-        <div className="flex h-full w-full flex-col">{children}</div>
+        {children}
       </div>
     )
   }
@@ -225,45 +223,30 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, isMobile } = useSidebar()
-  
-  if (isMobile) {
-    return (
-      <SheetPrimitiveTrigger asChild>
+  const { isMobile, toggleSidebar } = useSidebar()
+  const Trigger = isMobile ? SheetPrimitiveTrigger : "button"
+  const Comp = isMobile ? Slot : "button"
+
+  return (
+    <Trigger asChild={isMobile}>
         <Button
           ref={ref}
           data-sidebar="trigger"
           variant="ghost"
           size="icon"
-          className={cn("h-8 w-8 sm:hidden", className)}
+          className={cn("sm:flex", className)}
           onClick={(event) => {
             onClick?.(event)
+            if (!isMobile) {
+              toggleSidebar()
+            }
           }}
           {...props}
         >
           <PanelLeft />
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
-      </SheetPrimitiveTrigger>
-    )
-  }
-
-  return (
-    <Button
-      ref={ref}
-      data-sidebar="trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("h-8 w-8 hidden sm:flex", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    </Trigger>
   )
 })
 SidebarTrigger.displayName = "SidebarTrigger"
