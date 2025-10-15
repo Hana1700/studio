@@ -6,6 +6,7 @@ import './globals.css';
 import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AuthProvider } from '@/hooks/use-auth.tsx';
+import { PageContainer } from '@/components/page-container';
 
 export const metadata: Metadata = {
   title: 'Annuaire téléphonique de......',
@@ -39,14 +40,14 @@ export default function RootLayout({
                   <AppSidebar />
                 </SidebarContent>
               </Sidebar>
-              <div className="flex flex-col flex-1">
+              <PageContainer>
                 <AppHeader />
                 <main className="flex flex-1 justify-center py-8">
                   <div className="container w-full">
                     {children}
                   </div>
                 </main>
-              </div>
+              </PageContainer>
           </SidebarProvider>
         </AuthProvider>
         <Toaster />
