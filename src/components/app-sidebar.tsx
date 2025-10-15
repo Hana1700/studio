@@ -34,14 +34,13 @@ export function AppSidebar() {
           Structures
         </h2>
          <Accordion type="single" collapsible defaultValue={activeStructureId ? `item-${activeStructureId}` : undefined} className="space-y-1">
-          {structures.map((structure) => {
+          {open && structures.map((structure) => {
             return (
             <AccordionItem value={`item-${structure.id}`} key={structure.id} className="border-b-0">
                 <AccordionTrigger 
                   className={cn(
-                    "hover:no-underline rounded-md [&[data-state=open]>svg]:hidden",
+                    "hover:no-underline rounded-md p-0",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    "p-0",
                   )}
                 >
                   <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full p-2", !open && "justify-center")}>
@@ -49,7 +48,6 @@ export function AppSidebar() {
                       <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
                   </Link>
                 </AccordionTrigger>
-              {open && (
                 <AccordionContent>
                   <div className="flex flex-col space-y-1 pl-8 pr-2 py-2 border-l ml-6">
                       {structure.subDepartments.map((sub) => {
@@ -73,7 +71,6 @@ export function AppSidebar() {
                       )}
                   </div>
                 </AccordionContent>
-              )}
             </AccordionItem>
           )})}
         </Accordion>
