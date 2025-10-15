@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 "use client"
 
 import * as React from "react"
@@ -535,48 +527,55 @@ const SidebarMenuButton = React.forwardRef<
     const Comp = asChild ? Slot : "button"
     const { isMobile, open } = useSidebar()
 
-    const childNodes = React.Children.toArray(children)
-    const icon = childNodes.find((child) => {
-        if (!React.isValidElement(child)) return false;
-        // @ts-ignore
-        const propClassName = child.props.className || '';
-        return typeof propClassName === 'string' && propClassName.includes("shrink-0");
-    });
-    
-    const text = childNodes.find((child) => child.type === "span")
-    const buttonContent = tooltip ?? (text as React.ReactElement)?.props?.children
-
     if (isMobile) {
-        return (
-            <Comp
-                ref={ref}
-                data-sidebar="menu-button"
-                data-size={size}
-                data-active={isActive}
-                className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-                {...props}
-            >
-                {children}
-            </Comp>
-        )
+      return (
+        <Comp
+          ref={ref}
+          data-sidebar="menu-button"
+          data-size={size}
+          data-active={isActive}
+          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+          {...props}
+        >
+          {children}
+        </Comp>
+      );
     }
     
     if (!open) {
-      return null;
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Comp
+              ref={ref}
+              data-sidebar="menu-button"
+              data-size={size}
+              data-active={isActive}
+              className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+              {...props}
+            >
+              {children}
+            </Comp>
+          </TooltipTrigger>
+          <TooltipContent side="right" sideOffset={8}>
+            {tooltip}
+          </TooltipContent>
+        </Tooltip>
+      );
     }
 
     return (
-        <Comp
-            ref={ref}
-            data-sidebar="menu-button"
-            data-size={size}
-            data-active={isActive}
-            className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-            {...props}
-        >
-            {children}
-        </Comp>
-    )
+      <Comp
+        ref={ref}
+        data-sidebar="menu-button"
+        data-size={size}
+        data-active={isActive}
+        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        {...props}
+      >
+        {children}
+      </Comp>
+    );
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"

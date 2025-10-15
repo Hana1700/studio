@@ -27,10 +27,6 @@ export function AppSidebar() {
   
   const activeStructureId = getActiveStructure();
 
-  if (!open) {
-    return null;
-  }
-
   return (
     <div className="space-y-4 py-4">
       <div className="px-3 py-2">
@@ -39,20 +35,19 @@ export function AppSidebar() {
         </h2>
          <Accordion type="single" collapsible defaultValue={activeStructureId ? `item-${activeStructureId}` : undefined} className="space-y-1">
           {structures.map((structure) => {
-            const isActiveStructure = pathname.startsWith(`/structure/${structure.id}`);
             return (
             <AccordionItem value={`item-${structure.id}`} key={structure.id} className="border-b-0">
                 <AccordionTrigger 
                   className={cn(
                     "hover:no-underline rounded-md [&[data-state=open]>svg]:hidden",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    "p-2",
+                    "p-0",
                   )}
                 >
-                    <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full", !open && "justify-center")}>
+                  <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full p-2", !open && "justify-center")}>
                       <structure.icon className="h-5 w-5 shrink-0 text-primary" />
                       <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
-                    </Link>
+                  </Link>
                 </AccordionTrigger>
               {open && (
                 <AccordionContent>
