@@ -9,10 +9,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="flex items-center">
-           <SidebarTrigger className="mr-2 md:hidden" />
-           <div className="hidden md:flex mr-4">
-             <SidebarTrigger />
-           </div>
+           <SidebarTrigger className="mr-4" />
           <Link href="/" className="flex items-center space-x-2">
             <AppLogo className="h-6 w-6 text-primary" />
             <span className="hidden font-bold font-headline sm:inline-block">

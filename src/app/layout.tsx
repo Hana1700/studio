@@ -35,19 +35,17 @@ export default function RootLayout({
         <AuthProvider>
           <SidebarProvider>
             <div className="relative flex min-h-screen flex-col">
-              <AppHeader />
-              <div className="flex flex-1">
-                <Sidebar side="left">
+               <Sidebar side="left">
                   <SidebarContent>
                     <AppSidebar />
                   </SidebarContent>
                 </Sidebar>
-                <main className="flex flex-1 justify-center py-8">
-                  <div className="container w-full">
-                    {children}
-                  </div>
-                </main>
-              </div>
+              <AppHeader />
+              <main className="flex flex-1 justify-center py-8">
+                <div className="container w-full">
+                  {children}
+                </div>
+              </main>
             </div>
           </SidebarProvider>
         </AuthProvider>
