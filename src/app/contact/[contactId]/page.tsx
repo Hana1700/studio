@@ -78,13 +78,6 @@ export default function ContactPage({
               </div>
             </div>
           )}
-          <div className="flex items-center gap-4 rounded-lg border p-4">
-            <Mail className="h-6 w-6 text-primary" />
-            <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{contact.email}</p>
-            </div>
-          </div>
            <div className="flex items-center gap-4 rounded-lg border p-4">
             <Building className="h-6 w-6 text-primary" />
             <div>

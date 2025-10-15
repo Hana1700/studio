@@ -50,7 +50,6 @@ CREATE TABLE contacts (
     title TEXT NOT NULL,               -- Grade ou poste
     phone TEXT NOT NULL,               -- Numéro de téléphone principal
     mobile TEXT,                       -- Numéro de téléphone secondaire (optionnel)
-    email TEXT,                        -- Adresse email (optionnel)
     structure_id TEXT NOT NULL,        -- Clé étrangère qui référence la structure
     sub_department_id TEXT,            -- Clé étrangère qui référence la sous-direction (optionnel)
     FOREIGN KEY (structure_id) REFERENCES structures(id),
