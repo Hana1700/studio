@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -169,14 +169,14 @@ const Sidebar = React.forwardRef<
     {
       side = "left",
       variant = "sidebar",
-      collapsible = "offcanvas",
+      collapsible = "icon",
       className,
       children,
       ...props
     },
     ref
   ) => {
-    const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -193,34 +193,7 @@ const Sidebar = React.forwardRef<
       )
     }
 
-    if (collapsible === 'offcanvas') {
-      const isActuallyMobile = useIsMobile();
-      const sheetOpen = isActuallyMobile ? openMobile : open;
-      const setSheetOpen = isActuallyMobile ? setOpenMobile : setOpen;
-
-      return (
-         <Sheet open={sheetOpen} onOpenChange={setSheetOpen} {...props}>
-          <SheetContent
-            data-sidebar="sidebar"
-            data-mobile={isActuallyMobile}
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-            style={
-              {
-                "--sidebar-width": isActuallyMobile ? SIDEBAR_WIDTH_MOBILE : SIDEBAR_WIDTH,
-              } as React.CSSProperties
-            }
-            side={side}
-          >
-            <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
-            <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
-      )
-    }
-
-
-    if (isMobile) {
+    if (isMobile || collapsible === 'offcanvas') {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent

@@ -37,7 +37,7 @@ export default function RootLayout({
             <div className="relative flex min-h-screen flex-col">
               <AppHeader />
               <div className="flex flex-1">
-                <Sidebar side="left" collapsible="offcanvas">
+                <Sidebar side="left">
                   <SidebarContent>
                     <AppSidebar />
                   </SidebarContent>
