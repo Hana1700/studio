@@ -42,7 +42,11 @@ export default function RootLayout({
                     <AppSidebar />
                   </SidebarContent>
                 </Sidebar>
-                <main className="flex-1 container py-8">{children}</main>
+                <main className="flex flex-1 justify-center py-8">
+                  <div className="container w-full">
+                    {children}
+                  </div>
+                </main>
               </div>
             </div>
           </SidebarProvider>
