@@ -3,7 +3,7 @@ import { AppHeader } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarContent, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AuthProvider } from '@/hooks/use-auth.tsx';
 
@@ -34,19 +34,19 @@ export default function RootLayout({
       >
         <AuthProvider>
           <SidebarProvider>
-            <div className="relative flex min-h-screen flex-col">
-               <Sidebar side="left">
-                  <SidebarContent>
-                    <AppSidebar />
-                  </SidebarContent>
-                </Sidebar>
-              <AppHeader />
-              <main className="flex flex-1 justify-center py-8">
-                <div className="container w-full">
-                  {children}
-                </div>
-              </main>
-            </div>
+              <Sidebar side="left">
+                <SidebarContent>
+                  <AppSidebar />
+                </SidebarContent>
+              </Sidebar>
+              <div className="flex flex-col flex-1">
+                <AppHeader />
+                <main className="flex flex-1 justify-center py-8">
+                  <div className="container w-full">
+                    {children}
+                  </div>
+                </main>
+              </div>
           </SidebarProvider>
         </AuthProvider>
         <Toaster />

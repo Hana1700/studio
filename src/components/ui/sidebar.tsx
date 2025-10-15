@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger as SheetPrimitiveTrigger } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -92,9 +92,12 @@ const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      // Always use the mobile/off-canvas version
-      setOpenMobile((open) => !open)
-    }, [setOpenMobile])
+      if (isMobile) {
+        setOpenMobile((open) => !open)
+      } else {
+        setOpen((open) => !open)
+      }
+    }, [isMobile, setOpen])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -171,9 +174,10 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, openMobile, setOpenMobile, open } = useSidebar()
 
-    return (
+    if (isMobile) {
+      return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
             ref={ref}
@@ -193,6 +197,28 @@ const Sidebar = React.forwardRef<
           </SheetContent>
         </Sheet>
       )
+    }
+
+    return (
+      <div
+        ref={ref}
+        data-sidebar="sidebar"
+        data-side={side}
+        data-state={open ? "expanded" : "collapsed"}
+        className={cn(
+          "peer z-30 hidden h-svh flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width,margin] ease-in-out sm:flex",
+          "data-[state=expanded]:w-[--sidebar-width]",
+          "data-[state=collapsed]:w-[--sidebar-width-icon]",
+          "data-[side=right]:-order-1 data-[side=right]:ml-0 data-[side=right]:border-l data-[side=right]:border-r-0",
+          className
+        )}
+        {...props}
+      >
+        <DialogPrimitive.Title className="sr-only">Sidebar Navigation</DialogPrimitive.Title>
+        <DialogPrimitive.Description className="sr-only">Main navigation menu for the application.</DialogPrimitive.Description>
+        <div className="flex h-full w-full flex-col">{children}</div>
+      </div>
+    )
   }
 )
 Sidebar.displayName = "Sidebar"
@@ -201,7 +227,28 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isMobile } = useSidebar()
+  
+  if (isMobile) {
+    return (
+      <SheetPrimitiveTrigger asChild>
+        <Button
+          ref={ref}
+          data-sidebar="trigger"
+          variant="ghost"
+          size="icon"
+          className={cn("h-8 w-8", className)}
+          onClick={(event) => {
+            onClick?.(event)
+          }}
+          {...props}
+        >
+          <PanelLeft />
+          <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+      </SheetPrimitiveTrigger>
+    )
+  }
 
   return (
     <Button
