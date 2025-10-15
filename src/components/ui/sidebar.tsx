@@ -224,28 +224,28 @@ const SidebarTrigger = React.forwardRef<
   React.ComponentProps<typeof Button>
 >((props, ref) => {
   const { isMobile, toggleSidebar } = useSidebar();
-
-  if (isMobile) {
-    return (
-      <SheetPrimitiveTrigger asChild>
-        <Button ref={ref} variant="ghost" size="icon" {...props}>
-          <PanelLeft />
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
-      </SheetPrimitiveTrigger>
-    );
-  }
+  const Comp = isMobile ? SheetPrimitiveTrigger : 'button';
 
   return (
     <Button
       ref={ref}
+      asChild={isMobile}
       variant="ghost"
       size="icon"
-      onClick={toggleSidebar}
+      onClick={!isMobile ? toggleSidebar : undefined}
       {...props}
     >
-      <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
+      {isMobile ? (
+        <>
+          <PanelLeft />
+          <span className="sr-only">Toggle Sidebar</span>
+        </>
+      ) : (
+        <>
+          <PanelLeft />
+          <span className="sr-only">Toggle Sidebar</span>
+        </>
+      )}
     </Button>
   );
 });
@@ -522,54 +522,75 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state, open } = useSidebar()
+    const { isMobile, open } = useSidebar()
 
-    const button = (
-      <Comp
-        ref={ref}
-        data-sidebar="menu-button"
-        data-size={size}
-        data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-        {...props}
-      >
-        {children}
-      </Comp>
-    )
-    
     const childNodes = React.Children.toArray(children)
-    const icon = childNodes.find((child) => React.isValidElement(child) && child.props.className?.includes('shrink-0'))
-    const text = childNodes.find((child) => child.type === 'span')
+    const icon = childNodes.find((child) => {
+        if (!React.isValidElement(child)) return false
+        // This is a bit of a hack, but it works for now to find the icon.
+        // We can improve this later by using a more specific prop.
+        const childEl = child as React.ReactElement<React.ComponentProps<"svg">>
+        return childEl.props.className?.includes("shrink-0")
+      })
+    
+    const text = childNodes.find((child) => child.type === "span")
+    const buttonContent = tooltip || (text as React.ReactElement)?.props?.children;
 
-
-    if (isMobile) return button;
-
-    if (!open) {
-       const buttonContent = tooltip || (text as React.ReactElement)?.props?.children;
+    if (isMobile) {
         return (
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Comp
-                        ref={ref}
-                        data-sidebar="menu-button"
-                        data-size={size}
-                        data-active={isActive}
-                        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-                        {...props}
-                    >
-                        {icon}
-                        <span className="sr-only">{buttonContent}</span>
-                    </Comp>
-                </TooltipTrigger>
-                 <TooltipContent side="right" align="center">
-                    {buttonContent}
-                </TooltipContent>
-            </Tooltip>
+            <Comp
+                ref={ref}
+                data-sidebar="menu-button"
+                data-size={size}
+                data-active={isActive}
+                className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+                {...props}
+            >
+                {children}
+            </Comp>
         )
     }
 
+    if (!open) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Comp
+              ref={ref}
+              data-sidebar="menu-button"
+              data-size={size}
+              data-active={isActive}
+              className={cn(
+                sidebarMenuButtonVariants({ variant, size }),
+                className
+              )}
+              {...props}
+            >
+                {icon}
+                <span className="sr-only">{buttonContent}</span>
+            </Comp>
+          </TooltipTrigger>
+          {buttonContent ? (
+            <TooltipContent side="right" align="center">
+                {buttonContent}
+            </TooltipContent>
+          ) : null}
+        </Tooltip>
+      )
+    }
 
-    return button
+    return (
+        <Comp
+            ref={ref}
+            data-sidebar="menu-button"
+            data-size={size}
+            data-active={isActive}
+            className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+            {...props}
+        >
+            {children}
+        </Comp>
+    )
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"
