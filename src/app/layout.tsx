@@ -33,7 +33,7 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <SidebarProvider>
+          <SidebarProvider defaultOpen={false}>
               <Sidebar side="left">
                 <SidebarContent>
                   <AppSidebar />
