@@ -4,6 +4,7 @@
 
 
 
+
 "use client"
 
 import * as React from "react"
@@ -228,14 +229,18 @@ Sidebar.displayName = "Sidebar"
 const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   Omit<React.ComponentProps<typeof Button>, "asChild">
->((props, ref) => {
-  const { isMobile } = useSidebar();
+>(({ onClick, ...props }, ref) => {
+  const { isMobile, toggleSidebar } = useSidebar();
 
   const trigger = (
     <Button
       ref={ref}
       variant="ghost"
       size="icon"
+      onClick={(e) => {
+        toggleSidebar();
+        onClick?.(e);
+      }}
       {...props}
     >
       <PanelLeft />
@@ -533,8 +538,10 @@ const SidebarMenuButton = React.forwardRef<
     const icon = childNodes.find((child) => {
         if (!React.isValidElement(child)) return false;
         // @ts-ignore
-        return child.props.className?.includes("shrink-0");
+        const propClassName = child.props.className || '';
+        return typeof propClassName === 'string' && propClassName.includes("shrink-0");
     });
+    
     const text = childNodes.find((child) => child.type === "span")
     const buttonContent = tooltip ?? (text as React.ReactElement)?.props?.children
 
@@ -554,49 +561,20 @@ const SidebarMenuButton = React.forwardRef<
     }
     
     if (!open) {
-      const button = (
-        <Comp
-          ref={ref}
-          data-sidebar="menu-button"
-          data-size={size}
-          data-active={isActive}
-          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-          {...props}
-        >
-          {icon}
-          <span className="sr-only">{buttonContent}</span>
-        </Comp>
-      );
-      
-      if(asChild) {
-        return (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {button}
-            </TooltipTrigger>
-            {buttonContent ? (
-              <TooltipContent side="right" align="center">
-                  {buttonContent}
-              </TooltipContent>
-            ) : null}
-          </Tooltip>
-        );
-      }
-
       return (
-        <Tooltip>
-          <TooltipTrigger>
-            {button}
-          </TooltipTrigger>
-          {buttonContent ? (
-            <TooltipContent side="right" align="center">
-                {buttonContent}
-            </TooltipContent>
-          ) : null}
-        </Tooltip>
-      );
+            <Comp
+              ref={ref}
+              data-sidebar="menu-button"
+              data-size={size}
+              data-active={isActive}
+              className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+              {...props}
+            >
+                {icon}
+                <span className="sr-only">{buttonContent}</span>
+            </Comp>
+      )
     }
-
 
     return (
         <Comp
