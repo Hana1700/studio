@@ -10,7 +10,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent, SheetTrigger as SheetPrimitiveTrigger } from "@/components/ui/sheet"
@@ -229,11 +229,12 @@ const SidebarTrigger = React.forwardRef<
   
   if (isMobile) {
     return (
-       <SheetPrimitiveTrigger asChild onClick={() => setOpenMobile(true)}>
+       <SheetPrimitiveTrigger asChild>
         <Button
           ref={ref}
           variant="ghost"
           size="icon"
+          onClick={() => setOpenMobile(true)}
           {...props}
         >
           <PanelLeft />
@@ -512,7 +513,7 @@ const SidebarMenuButton = React.forwardRef<
   React.ComponentProps<"button"> & {
     asChild?: boolean
     isActive?: boolean
-    tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    tooltip?: React.ReactNode
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
@@ -535,11 +536,11 @@ const SidebarMenuButton = React.forwardRef<
     const icon = childNodes.find((child) => {
         if (!React.isValidElement(child)) return false;
         const childEl = child as React.ReactElement<React.ComponentProps<"svg">>;
+        // A bit of a hacky way to find the icon.
         return childEl.props.className?.includes("shrink-0");
     });
-    
     const text = childNodes.find((child) => child.type === "span")
-    const buttonContent = tooltip || (text as React.ReactElement)?.props?.children;
+    const buttonContent = tooltip ?? (text as React.ReactElement)?.props?.children
 
     if (isMobile) {
         return (
@@ -557,23 +558,20 @@ const SidebarMenuButton = React.forwardRef<
     }
 
     if (!open) {
-      const button = (
-        <Comp
-          ref={ref}
-          data-sidebar="menu-button"
-          data-size={size}
-          data-active={isActive}
-          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-          {...props}
-        >
-          {icon}
-          <span className="sr-only">{buttonContent}</span>
-        </Comp>
-      );
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            {button}
+            <Comp
+              ref={ref}
+              data-sidebar="menu-button"
+              data-size={size}
+              data-active={isActive}
+              className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+              {...props}
+            >
+              {icon}
+              <span className="sr-only">{buttonContent}</span>
+            </Comp>
           </TooltipTrigger>
           {buttonContent ? (
             <TooltipContent side="right" align="center">
@@ -769,3 +767,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
