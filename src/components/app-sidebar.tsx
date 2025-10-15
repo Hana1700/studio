@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -12,7 +11,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { SidebarMenu, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -27,6 +26,10 @@ export function AppSidebar() {
   };
   
   const activeStructureId = getActiveStructure();
+
+  if (!open) {
+    return null;
+  }
 
   return (
     <div className="space-y-4 py-4">
@@ -46,10 +49,10 @@ export function AppSidebar() {
                     "p-2",
                   )}
                 >
-                  <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full", !open && "justify-center")}>
+                    <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full", !open && "justify-center")}>
                       <structure.icon className="h-5 w-5 shrink-0 text-primary" />
                       <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
-                  </Link>
+                    </Link>
                 </AccordionTrigger>
               {open && (
                 <AccordionContent>
