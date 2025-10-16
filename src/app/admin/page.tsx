@@ -130,8 +130,7 @@ export default function AdminPage() {
     });
 
     if (response.ok) {
-        const updatedStructures = await response.json();
-        setStructures(updatedStructures);
+        await fetchData();
         resetStructureForm();
         setIsStructureDialogOpen(false);
     } else {
@@ -602,3 +601,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
