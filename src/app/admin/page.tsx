@@ -118,7 +118,9 @@ export default function AdminPage() {
     const structureData = {
         name: newStructureName,
         description: 'Nouvelle structure ajoutée',
-        subDepartments: subDepartments.filter(sd => sd.name.trim() !== '')
+        subDepartments: subDepartments
+            .filter(sd => sd.name.trim() !== '')
+            .map(sd => ({ name: sd.name }))
     };
 
     const response = await fetch('/api/structures', {
