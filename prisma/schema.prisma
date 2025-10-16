@@ -3,12 +3,11 @@
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:./sqlite.db"
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 model Structure {
@@ -22,6 +21,7 @@ model Structure {
 model SubDepartment {
   id          String    @id @default(cuid())
   name        String
+  description String?
   structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId String
   contacts    Contact[]
@@ -40,3 +40,5 @@ model Contact {
   subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
   subDepartmentId String?
 }
+
+    

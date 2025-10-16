@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth.tsx';
+import { useAuth } from '@/hooks/use-auth';
 import {
   Card,
   CardContent,
@@ -120,7 +120,7 @@ export default function AdminPage() {
         description: 'Nouvelle structure ajoutée',
         subDepartments: subDepartments
             .filter(sd => sd.name.trim() !== '')
-            .map(sd => ({ name: sd.name }))
+            .map(sd => ({ name: sd.name, description: '' }))
     };
 
     const response = await fetch('/api/structures', {
@@ -601,3 +601,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
