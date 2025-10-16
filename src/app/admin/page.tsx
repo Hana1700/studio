@@ -36,6 +36,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
 
 
 export default function AdminPage() {
@@ -49,10 +50,9 @@ export default function AdminPage() {
   const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
   
   const [newStructureName, setNewStructureName] = useState('');
+  const [newStructureDescription, setNewStructureDescription] = useState('');
   const [newSubDepartmentName, setNewSubDepartmentName] = useState('');
   const [parentStructureId, setParentStructureId] = useState('');
-
-  const [subDepartments, setSubDepartments] = useState([{ id: Date.now().toString(), name: '' }]);
 
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   
@@ -97,30 +97,10 @@ export default function AdminPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleAddSubDepartment = () => {
-    setSubDepartments([
-      ...subDepartments,
-      { id: Date.now().toString(), name: '' },
-    ]);
-  };
-
-  const handleRemoveSubDepartment = (id: string) => {
-    setSubDepartments(subDepartments.filter((sub) => sub.id !== id));
-  };
-
-  const handleSubDepartmentNameChange = (id: string, name: string) => {
-    setSubDepartments(
-      subDepartments.map((sub) => (sub.id === id ? { ...sub, name } : sub))
-    );
-  };
-
   const handleSaveStructure = async () => {
     const structureData = {
         name: newStructureName,
-        description: 'Nouvelle structure ajoutée',
-        subDepartments: subDepartments
-            .map(sd => sd.name.trim())
-            .filter(name => name !== '')
+        description: newStructureDescription,
     };
 
     const response = await fetch('/api/structures', {
@@ -141,7 +121,7 @@ export default function AdminPage() {
 
   const resetStructureForm = () => {
     setNewStructureName('');
-    setSubDepartments([{ id: Date.now().toString(), name: '' }]);
+    setNewStructureDescription('');
   };
   
   const handleCancelStructure = () => {
@@ -308,7 +288,7 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
            <Accordion type="single" collapsible className="w-full">
-            {structures.map((structure) => (
+            {Array.isArray(structures) && structures.map((structure) => (
               <AccordionItem value={`structure-${structure.id}`} key={structure.id}>
                 <AccordionTrigger>
                     <div className='flex justify-between w-full items-center'>
@@ -415,8 +395,7 @@ export default function AdminPage() {
           <DialogHeader>
             <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
             <DialogDescription>
-              Remplissez les détails de la structure et de ses
-              sous-directions.
+              Remplissez les détails de la nouvelle structure.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-6 py-4">
@@ -432,47 +411,17 @@ export default function AdminPage() {
                 onChange={(e) => setNewStructureName(e.target.value)}
               />
             </div>
-            <Separator />
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium">Sous-directions</h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddSubDepartment}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Ajouter
-                </Button>
-              </div>
-              <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
-                {subDepartments.map((sub, index) => (
-                  <div
-                    key={sub.id}
-                    className="flex items-center gap-4 rounded-lg border p-4"
-                  >
-                    <Building className="h-6 w-6 text-primary" />
-                    <div className="flex-1">
-                      <Input
-                        placeholder={`Nom de la sous-direction ${index + 1}`}
-                        className="w-full"
-                        value={sub.name}
-                        onChange={(e) =>
-                          handleSubDepartmentNameChange(sub.id, e.target.value)
-                        }
-                      />
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveSubDepartment(sub.id)}
-                      disabled={subDepartments.length <= 1}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Description de la structure"
+                className="col-span-3"
+                value={newStructureDescription}
+                onChange={(e) => setNewStructureDescription(e.target.value)}
+              />
             </div>
           </div>
           <DialogFooter>
