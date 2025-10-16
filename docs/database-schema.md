@@ -22,7 +22,6 @@ model Structure {
   name          String
   description   String?
   subDepartments SubDepartment[]
-  contacts      Contact[]
 }
 ```
 
