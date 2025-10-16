@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name is required' }, { status: 400 });
         }
 
-        await prisma.structure.create({
+        const newStructure = await prisma.structure.create({
             data: {
                 name,
                 description,
