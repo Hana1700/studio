@@ -15,7 +15,6 @@ model Structure {
   name          String
   description   String?
   subDepartments SubDepartment[]
-  contacts      Contact[]
 }
 
 model SubDepartment {
@@ -34,8 +33,8 @@ model Contact {
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
-  structure       Structure      @relation(fields: [structureId], references: [id])
   structureId     String
+  structure       Structure      @relation(fields: [structureId], references: [id])
   subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
   subDepartmentId String?
 }
