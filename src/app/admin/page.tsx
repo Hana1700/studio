@@ -133,6 +133,7 @@ export default function AdminPage() {
         await fetchData();
         resetStructureForm();
         setIsStructureDialogOpen(false);
+        router.refresh();
     } else {
         console.error("Failed to save structure", await response.text());
     }
@@ -601,5 +602,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
