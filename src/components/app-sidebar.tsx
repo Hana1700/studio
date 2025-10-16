@@ -43,7 +43,7 @@ export function AppSidebar() {
           Structures
         </h2>
          <Accordion type="single" collapsible defaultValue={activeStructureId ? `item-${activeStructureId}` : undefined} className="space-y-1">
-          {open && structures.map((structure) => {
+          {open && Array.isArray(structures) && structures.map((structure) => {
             return (
             <AccordionItem value={`item-${structure.id}`} key={structure.id} className="border-b-0">
                 <AccordionTrigger 
