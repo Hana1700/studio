@@ -8,6 +8,9 @@ export type Contact = PrismaContact & {
 
 export type SubDepartment = PrismaSubDepartment & {
   contacts: Contact[];
+  _count?: {
+    contacts: number;
+  };
 };
 
 export type Structure = PrismaStructure & {

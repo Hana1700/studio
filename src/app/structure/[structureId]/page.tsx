@@ -13,22 +13,24 @@ async function getStructure(structureId: string): Promise<Structure | null> {
         include: {
             subDepartments: {
                 include: {
-                    contacts: true,
-                },
+                    _count: {
+                        select: { contacts: true }
+                    }
+                }
             },
         },
     });
 
     if (!structure) return null;
 
-    // The icon is not in the DB, so we add it here.
-    // In a real app, you might store an icon name string in the DB.
     return {
         ...structure,
         icon: Building,
         subDepartments: structure.subDepartments.map(sd => ({
             ...sd,
             icon: Building,
+            contacts: [], // This is not needed on this page, but keeps type consistency.
+            _count: sd._count,
         })),
     };
 }

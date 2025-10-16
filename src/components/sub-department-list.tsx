@@ -30,7 +30,7 @@ export function SubDepartmentList({ structure }: { structure: Structure }) {
                   <div>
                     <p className="font-medium">{sub.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {sub.contacts.length} contact(s)
+                      {sub._count?.contacts ?? 0} contact(s)
                     </p>
                   </div>
                 </div>
