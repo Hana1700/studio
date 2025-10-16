@@ -1,13 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider = "sqlite"
-  url      = "file:./sqlite.db"
+  url      = "file:./dev.db"
 }
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 model Structure {
@@ -21,7 +19,6 @@ model Structure {
 model SubDepartment {
   id          String    @id @default(cuid())
   name        String
-  description String?
   structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId String
   contacts    Contact[]
@@ -40,5 +37,3 @@ model Contact {
   subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
   subDepartmentId String?
 }
-
-    

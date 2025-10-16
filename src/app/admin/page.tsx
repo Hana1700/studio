@@ -119,8 +119,8 @@ export default function AdminPage() {
         name: newStructureName,
         description: 'Nouvelle structure ajoutée',
         subDepartments: subDepartments
-            .filter(sd => sd.name.trim() !== '')
-            .map(sd => ({ name: sd.name, description: '' }))
+            .map(sd => sd.name.trim())
+            .filter(name => name !== '')
     };
 
     const response = await fetch('/api/structures', {
@@ -134,7 +134,7 @@ export default function AdminPage() {
         resetStructureForm();
         setIsStructureDialogOpen(false);
     } else {
-        console.error("Failed to save structure");
+        console.error("Failed to save structure", await response.text());
     }
   };
 
@@ -601,5 +601,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    

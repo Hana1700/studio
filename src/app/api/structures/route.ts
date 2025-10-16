@@ -35,7 +35,7 @@ export async function POST(request: Request) {
                 name,
                 description,
                 subDepartments: {
-                    create: subDepartments.map((sd: { name: string }) => ({ name: sd.name })),
+                    create: subDepartments.map((sdName: string) => ({ name: sdName })),
                 },
             },
             include: {
