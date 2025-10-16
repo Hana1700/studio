@@ -1,28 +1,15 @@
 import type { LucideIcon } from 'lucide-react';
+import { Structure as PrismaStructure, SubDepartment as PrismaSubDepartment, Contact as PrismaContact } from '@prisma/client';
 
-export interface Contact {
-  id: string;
-  name: string;
-  title: string;
-  phone: string;
-  mobile?: string;
-  structureId?: string;
-  subDepartmentId?: string;
+export type Contact = PrismaContact & {
   structureName?: string;
   subDepartmentName?: string;
-}
+};
 
-export interface SubDepartment {
-  id: string;
-  name: string;
-  icon: LucideIcon;
+export type SubDepartment = PrismaSubDepartment & {
   contacts: Contact[];
-}
+};
 
-export interface Structure {
-  id: string;
-  name: string;
-  icon: LucideIcon;
-  description: string;
+export type Structure = PrismaStructure & {
   subDepartments: SubDepartment[];
-}
+};

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Structure } from '@/lib/types';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Building } from 'lucide-react';
 
 export function SubDepartmentList({ structure }: { structure: Structure }) {
   if (structure.subDepartments.length === 0) {
@@ -25,7 +25,7 @@ export function SubDepartmentList({ structure }: { structure: Structure }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <sub.icon className="h-6 w-6 text-primary" />
+                    <Building className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium">{sub.name}</p>

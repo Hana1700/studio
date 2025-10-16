@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, User, Building } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { allContacts, structures } from '@/lib/data';
 import Link from 'next/link';
+import type { Contact, Structure } from '@/lib/types';
 
 type Suggestion =
-  | { type: 'contact'; data: (typeof allContacts)[0] }
-  | { type: 'structure'; data: (typeof structures)[0] };
+  | { type: 'contact'; data: Contact }
+  | { type: 'structure'; data: Structure };
 
 export function SearchBar() {
   const router = useRouter();
@@ -19,27 +19,48 @@ export function SearchBar() {
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (query.length > 0) {
-      const contactSuggestions = allContacts
-        .filter((contact) =>
-          contact.name.toLowerCase().startsWith(query.toLowerCase())
-        )
-        .slice(0, 3)
-        .map((c) => ({ type: 'contact' as const, data: c }));
+    const fetchSuggestions = async () => {
+      if (query.length > 0) {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Assuming API returns mixed or contacts only. Let's process for suggestions.
+          // For this simplified logic, we will assume it returns contacts and we can derive structures.
+          // A more robust API would return suggestion types.
+          const contactSuggestions = data
+            .slice(0, 3)
+            .map((c: Contact) => ({ type: 'contact' as const, data: c }));
+          
+          // This part is tricky without a dedicated structure search endpoint.
+          // We will simulate it by filtering contacts' structures.
+          const structureNames = new Set<string>();
+          const structureSuggestions = data
+            .map((c: Contact) => ({id: c.structureId, name: c.structureName}))
+            .filter((s: {id: string, name: string | undefined}) => {
+                if(s.name && s.name.toLowerCase().startsWith(query.toLowerCase()) && !structureNames.has(s.name)){
+                    structureNames.add(s.name);
+                    return true;
+                }
+                return false;
+            })
+            .slice(0, 2)
+            .map((s: {id: string, name: string | undefined}) => ({ type: 'structure' as const, data: s as unknown as Structure }));
 
-      const structureSuggestions = structures
-        .filter((structure) =>
-          structure.name.toLowerCase().startsWith(query.toLowerCase())
-        )
-        .slice(0, 2)
-        .map((s) => ({ type: 'structure' as const, data: s }));
-        
-      setSuggestions([...contactSuggestions, ...structureSuggestions]);
-      setShowSuggestions(true);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
+          setSuggestions([...contactSuggestions, ...structureSuggestions]);
+          setShowSuggestions(true);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    };
+    
+    const debounceTimer = setTimeout(() => {
+        fetchSuggestions();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+
   }, [query]);
 
   useEffect(() => {

@@ -14,7 +14,9 @@
           "description": "A brief description of the structure."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
     "SubDepartment": {
       "title": "SubDepartment",
@@ -30,7 +32,10 @@
           "description": "The ID of the parent structure."
         }
       },
-      "required": ["name", "structureId"]
+      "required": [
+        "name",
+        "structureId"
+      ]
     },
     "Contact": {
       "title": "Contact",
@@ -45,13 +50,21 @@
           "type": "string",
           "description": "The job title of the contact."
         },
-        "phone": {
+        "threeDigits": {
           "type": "string",
-          "description": "The primary phone number."
+          "description": "First part of the phone number."
         },
-        "mobile": {
+        "fourDigits": {
           "type": "string",
-          "description": "The secondary or mobile phone number."
+          "description": "Second part of the phone number."
+        },
+        "fourDigitsXX": {
+          "type": "string",
+          "description": "Third part of the phone number."
+        },
+        "fourDigitsYY": {
+          "type": "string",
+          "description": "Fourth part of the phone number."
         },
         "structureId": {
           "type": "string",
@@ -62,11 +75,17 @@
           "description": "The ID of the sub-department this contact belongs to."
         }
       },
-      "required": ["name", "title", "phone", "structureId"]
+      "required": [
+        "name",
+        "title",
+        "structureId"
+      ]
     }
   },
   "auth": {
-    "providers": ["anonymous"]
+    "providers": [
+      "anonymous"
+    ]
   },
   "firestore": {
     "/structures/{structureId}": {

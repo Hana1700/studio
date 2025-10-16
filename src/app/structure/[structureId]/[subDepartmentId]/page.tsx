@@ -1,17 +1,51 @@
 import { notFound } from 'next/navigation';
-import { structures } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumb';
 import { ContactList } from '@/components/contact-list';
+import { PrismaClient } from '@prisma/client';
+import type { Structure, SubDepartment } from '@/lib/types';
 
-export default function SubDepartmentPage({
+const prisma = new PrismaClient();
+
+async function getSubDepartmentData(structureId: string, subDepartmentId: string) {
+    const structure = await prisma.structure.findUnique({
+        where: { id: structureId },
+    });
+
+    const subDepartment = await prisma.subDepartment.findUnique({
+        where: { id: subDepartmentId },
+        include: {
+            contacts: {
+              include: {
+                structure: true,
+                subDepartment: true,
+              }
+            }
+        }
+    });
+
+    if (!structure || !subDepartment) {
+        return { structure: null, subDepartment: null };
+    }
+    
+    const formattedSubDepartment = {
+      ...subDepartment,
+      contacts: subDepartment.contacts.map(c => ({
+        ...c,
+        structureName: c.structure.name,
+        subDepartmentName: c.subDepartment?.name
+      }))
+    };
+
+    return { structure, subDepartment: formattedSubDepartment };
+}
+
+
+export default async function SubDepartmentPage({
   params,
 }: {
   params: { structureId: string; subDepartmentId: string };
 }) {
-  const structure = structures.find((s) => s.id === params.structureId);
-  const subDepartment = structure?.subDepartments.find(
-    (sd) => sd.id === params.subDepartmentId
-  );
+  const { structure, subDepartment } = await getSubDepartmentData(params.structureId, params.subDepartmentId);
 
   if (!structure || !subDepartment) {
     notFound();
@@ -25,12 +59,7 @@ export default function SubDepartmentPage({
       href: `/structure/${structure.id}/${subDepartment.id}`,
     },
   ];
-
-  const contactsWithSubDepartment = subDepartment.contacts.map(contact => ({
-    ...contact,
-    subDepartmentName: subDepartment.name,
-  }));
-
+  
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
@@ -45,7 +74,7 @@ export default function SubDepartmentPage({
         </div>
       </div>
 
-      <ContactList contacts={contactsWithSubDepartment} />
+      <ContactList contacts={subDepartment.contacts} />
     </div>
   );
 }

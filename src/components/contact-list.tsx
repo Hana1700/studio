@@ -14,18 +14,13 @@ import {
 import {
   Phone,
   Smartphone,
-  User,
-  Briefcase,
-  Mail,
   Search,
-  Building,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import Link from 'next/link';
 
-function ContactCard({ contact }: { contact: Contact & { structureId?: string; subDepartmentId?: string; subDepartmentName?: string } }) {
+function ContactCard({ contact }: { contact: Contact }) {
   const contactLink = `/contact/${contact.id}`;
 
   return (
@@ -48,12 +43,12 @@ function ContactCard({ contact }: { contact: Contact & { structureId?: string; s
         <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
           <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
             <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{contact.phone}</span>
+            <span className="truncate">{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</span>
           </div>
-          {contact.mobile && (
+          {contact.fourDigitsYY && (
             <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
               <Smartphone className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{contact.mobile}</span>
+              <span className="truncate">{contact.fourDigitsYY}</span>
             </div>
           )}
         </CardContent>
@@ -62,7 +57,7 @@ function ContactCard({ contact }: { contact: Contact & { structureId?: string; s
   );
 }
 
-export function ContactList({ contacts }: { contacts: (Contact & { structureId?: string, subDepartmentId?: string, subDepartmentName?: string })[] }) {
+export function ContactList({ contacts }: { contacts: Contact[] }) {
   const [search, setSearch] = useState('');
 
   const filteredContacts =
@@ -70,8 +65,6 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
       (contact) =>
         contact.name.toLowerCase().includes(search.toLowerCase()) ||
         contact.title.toLowerCase().includes(search.toLowerCase()) ||
-        contact.phone.includes(search) ||
-        contact.mobile?.includes(search) ||
         contact.subDepartmentName?.toLowerCase().includes(search.toLowerCase())
     ) || [];
 
@@ -136,13 +129,17 @@ export function ContactList({ contacts }: { contacts: (Contact & { structureId?:
                         </CellComponent>
                       </TableCell>
                       <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.phone}</CellComponent>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.threeDigits}</CellComponent>
+                      </TableCell>
+                       <TableCell>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigits}</CellComponent>
+                      </TableCell>
+                       <TableCell>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigitsXX}</CellComponent>
                       </TableCell>
                       <TableCell>
-                        {contact.mobile ? <CellComponent {...cellProps} className="block hover:text-primary">{contact.mobile}</CellComponent> : <span className="text-muted-foreground">-</span>}
+                        {contact.fourDigitsYY ? <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigitsYY}</CellComponent> : <span className="text-muted-foreground">-</span>}
                       </TableCell>
-                      <TableCell><span className="text-muted-foreground">-</span></TableCell>
-                      <TableCell><span className="text-muted-foreground">-</span></TableCell>
                     </TableRow>
                   );
                 })}

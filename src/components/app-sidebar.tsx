@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { structures } from '@/lib/data';
 import {
   Accordion,
   AccordionContent,
@@ -12,10 +11,20 @@ import {
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useEffect, useState } from 'react';
+import type { Structure } from '@/lib/types';
+import { Building } from 'lucide-react';
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { open } = useSidebar();
+  const [structures, setStructures] = useState<Structure[]>([]);
+
+  useEffect(() => {
+    fetch('/api/structures')
+      .then(res => res.json())
+      .then(data => setStructures(data));
+  }, []);
 
   const getActiveStructure = () => {
     const parts = pathname.split('/');
@@ -44,7 +53,7 @@ export function AppSidebar() {
                   )}
                 >
                   <Link href={`/structure/${structure.id}`} className={cn("flex items-center gap-2 w-full p-2", !open && "justify-center")}>
-                      <structure.icon className="h-5 w-5 shrink-0 text-primary" />
+                      <Building className="h-5 w-5 shrink-0 text-primary" />
                       <span className={cn("truncate", !open && "hidden")}>{structure.name}</span>
                   </Link>
                 </AccordionTrigger>
@@ -60,7 +69,7 @@ export function AppSidebar() {
                               asChild
                           >
                               <Link href={`/structure/${structure.id}/${sub.id}`}>
-                              <sub.icon className="mr-3 h-5 w-5" />
+                              <Building className="mr-3 h-5 w-5" />
                               {sub.name}
                               </Link>
                           </Button>

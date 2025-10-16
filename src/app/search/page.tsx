@@ -1,25 +1,29 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { allContacts } from '@/lib/data';
+import { useEffect, useState } from 'react';
 import { ContactList } from '@/components/contact-list';
-import Link from 'next/link';
+import type { Contact } from '@/lib/types';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
+  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
 
-  const filteredContacts = query
-    ? allContacts.filter(
-        (contact) =>
-          contact.name.toLowerCase().includes(query.toLowerCase()) ||
-          contact.title.toLowerCase().includes(query.toLowerCase()) ||
-          contact.phone.includes(query) ||
-          contact.mobile?.includes(query) ||
-          contact.structureName.toLowerCase().includes(query.toLowerCase()) ||
-          contact.subDepartmentName?.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
+  useEffect(() => {
+    const fetchContacts = async () => {
+      if (query) {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFilteredContacts(data);
+        }
+      } else {
+        setFilteredContacts([]);
+      }
+    };
+    fetchContacts();
+  }, [query]);
 
   return (
     <div>

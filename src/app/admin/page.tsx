@@ -25,9 +25,8 @@ import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown,
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { structures as initialStructures, allContacts as initialContacts } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import type { Contact } from '@/lib/types';
+import type { Contact, Structure, SubDepartment } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
@@ -43,8 +42,8 @@ export default function AdminPage() {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
   
-  const [structures, setStructures] = useState([...initialStructures]);
-  const [contacts, setContacts] = useState([...initialContacts]);
+  const [structures, setStructures] = useState<Structure[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
@@ -53,7 +52,7 @@ export default function AdminPage() {
   const [newSubDepartmentName, setNewSubDepartmentName] = useState('');
   const [parentStructureId, setParentStructureId] = useState('');
 
-  const [subDepartments, setSubDepartments] = useState([{ id: 1, name: '' }]);
+  const [subDepartments, setSubDepartments] = useState([{ id: Date.now().toString(), name: '' }]);
 
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   
@@ -61,16 +60,38 @@ export default function AdminPage() {
     id: '',
     name: '',
     title: '',
-    phone: '',
-    mobile: '',
+    threeDigits: '',
+    fourDigits: '',
+    fourDigitsXX: '',
+    fourDigitsYY: '',
     structureId: '',
     subDepartmentId: '',
   });
 
+   useEffect(() => {
+    fetchData();
+  }, []);
+  
+  const fetchData = async () => {
+    try {
+      const [structuresRes, contactsRes] = await Promise.all([
+        fetch('/api/structures'),
+        fetch('/api/contacts'),
+      ]);
+      if (structuresRes.ok) {
+        const structuresData = await structuresRes.json();
+        setStructures(structuresData);
+      }
+      if (contactsRes.ok) {
+        const contactsData = await contactsRes.json();
+        setContacts(contactsData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+  };
+
   useEffect(() => {
-    // If auth state is known and it is false, redirect.
-    // Using `isAuthenticated === false` is important to avoid redirecting
-    // on the initial render when the state is not yet known.
     if (isAuthenticated === false) {
       router.push('/login');
     }
@@ -79,48 +100,45 @@ export default function AdminPage() {
   const handleAddSubDepartment = () => {
     setSubDepartments([
       ...subDepartments,
-      { id: Date.now(), name: '' },
+      { id: Date.now().toString(), name: '' },
     ]);
   };
 
-  const handleRemoveSubDepartment = (id: number) => {
+  const handleRemoveSubDepartment = (id: string) => {
     setSubDepartments(subDepartments.filter((sub) => sub.id !== id));
   };
 
-  const handleSubDepartmentNameChange = (id: number, name: string) => {
+  const handleSubDepartmentNameChange = (id: string, name: string) => {
     setSubDepartments(
       subDepartments.map((sub) => (sub.id === id ? { ...sub, name } : sub))
     );
   };
 
-  const handleSaveStructure = () => {
-    const newStructure = {
-      id: newStructureName.toLowerCase().replace(/\s/g, '-'),
-      name: newStructureName,
-      icon: Building,
-      description: 'Nouvelle structure ajoutée',
-      subDepartments: subDepartments
-        .filter((sd) => sd.name.trim() !== '')
-        .map((sd) => ({
-          id: sd.name.toLowerCase().replace(/\s/g, '-'),
-          name: sd.name,
-          icon: Building,
-          contacts: [],
-        })),
+  const handleSaveStructure = async () => {
+    const structureData = {
+        name: newStructureName,
+        description: 'Nouvelle structure ajoutée',
+        subDepartments: subDepartments.filter(sd => sd.name.trim() !== '')
     };
 
-    if (newStructure.name.trim() !== '') {
-        // @ts-ignore
-        setStructures([...structures, newStructure]);
-    }
+    const response = await fetch('/api/structures', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(structureData),
+    });
 
-    resetStructureForm();
-    setIsStructureDialogOpen(false);
+    if (response.ok) {
+        await fetchData();
+        resetStructureForm();
+        setIsStructureDialogOpen(false);
+    } else {
+        console.error("Failed to save structure");
+    }
   };
 
   const resetStructureForm = () => {
     setNewStructureName('');
-    setSubDepartments([{ id: 1, name: '' }]);
+    setSubDepartments([{ id: Date.now().toString(), name: '' }]);
   };
   
   const handleCancelStructure = () => {
@@ -134,8 +152,10 @@ export default function AdminPage() {
         id: '',
         name: '',
         title: '',
-        phone: '',
-        mobile: '',
+        threeDigits: '',
+        fourDigits: '',
+        fourDigitsXX: '',
+        fourDigitsYY: '',
         structureId: '',
         subDepartmentId: '',
     });
@@ -152,28 +172,44 @@ export default function AdminPage() {
         id: contact.id,
         name: contact.name,
         title: contact.title,
-        phone: contact.phone,
-        mobile: contact.mobile || '',
+        threeDigits: contact.threeDigits || '',
+        fourDigits: contact.fourDigits || '',
+        fourDigitsXX: contact.fourDigitsXX || '',
+        fourDigitsYY: contact.fourDigitsYY || '',
         structureId: contact.structureId || '',
         subDepartmentId: contact.subDepartmentId || '',
     });
     setIsContactDialogOpen(true);
   };
 
-  const handleDeleteContact = (contactId: string) => {
-    setContacts(contacts.filter(c => c.id !== contactId));
+  const handleDeleteContact = async (contactId: string) => {
+    const response = await fetch(`/api/contacts/${contactId}`, {
+        method: 'DELETE',
+    });
+    if (response.ok) {
+        await fetchData();
+    } else {
+        console.error("Failed to delete contact");
+    }
   };
 
-  const handleSaveContact = () => {
-    if (editingContact) {
-      // @ts-ignore
-      setContacts(contacts.map(c => c.id === editingContact.id ? { ...c, ...contactForm } : c));
+  const handleSaveContact = async () => {
+    const url = editingContact ? `/api/contacts/${editingContact.id}` : '/api/contacts';
+    const method = editingContact ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+    });
+    
+    if (response.ok) {
+        await fetchData();
+        resetContactForm();
+        setIsContactDialogOpen(false);
     } else {
-       // @ts-ignore
-      setContacts([...contacts, { ...contactForm, id: `contact-${Date.now()}` }]);
+        console.error("Failed to save contact");
     }
-    resetContactForm();
-    setIsContactDialogOpen(false);
   };
 
   const handleCancelContact = () => {
@@ -181,24 +217,28 @@ export default function AdminPage() {
     setIsContactDialogOpen(false);
   };
   
-  const handleSaveSubDepartment = () => {
+  const handleSaveSubDepartment = async () => {
     if (!parentStructureId || !newSubDepartmentName.trim()) return;
 
-    const newSubDept = {
-      id: newSubDepartmentName.toLowerCase().replace(/\s/g, '-'),
+    const subDeptData = {
       name: newSubDepartmentName,
-      icon: Building,
-      contacts: [],
+      structureId: parentStructureId,
     };
+    
+    const response = await fetch('/api/subdepartments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subDeptData)
+    });
 
-    setStructures(structures.map(s => 
-      s.id === parentStructureId 
-        ? { ...s, subDepartments: [...s.subDepartments, newSubDept] }
-        : s
-    ));
 
-    resetSubDepartmentForm();
-    setIsSubDepartmentDialogOpen(false);
+    if (response.ok) {
+        await fetchData();
+        resetSubDepartmentForm();
+        setIsSubDepartmentDialogOpen(false);
+    } else {
+        console.error("Failed to save sub-department");
+    }
   };
 
   const resetSubDepartmentForm = () => {
@@ -213,8 +253,6 @@ export default function AdminPage() {
 
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
 
-  // We render nothing until we know the auth status, to prevent flash of content
-  // and hydration errors. The useEffect above will handle the redirect.
   if (!isAuthenticated) {
     return null;
   }
@@ -276,7 +314,6 @@ export default function AdminPage() {
                             <p className="text-sm text-muted-foreground mr-4">
                                 {structure.subDepartments.length} sous-direction(s)
                             </p>
-                            {/* Actions for structure can go here */}
                          </div>
                     </div>
                 </AccordionTrigger>
@@ -302,12 +339,12 @@ export default function AdminPage() {
                                 {contact.subDepartmentName && <p><span className="font-semibold">Service:</span> {contact.subDepartmentName}</p>}
                                 <div className="flex items-center gap-2">
                                   <Phone className="h-4 w-4 text-muted-foreground" />
-                                  <span>{contact.phone}</span>
+                                  <span>{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</span>
                                 </div>
-                                {contact.mobile && (
+                                {contact.fourDigitsYY && (
                                   <div className="flex items-center gap-2">
                                     <Smartphone className="h-4 w-4 text-muted-foreground" />
-                                    <span>{contact.mobile}</span>
+                                    <span>{contact.fourDigitsYY}</span>
                                   </div>
                                 )}
                               </CardContent>
@@ -341,7 +378,7 @@ export default function AdminPage() {
                                         <div className="text-sm text-muted-foreground">{contact.title}</div>
                                     </TableCell>
                                     <TableCell>{contact.subDepartmentName}</TableCell>
-                                    <TableCell>{contact.phone}</TableCell>
+                                    <TableCell>{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
                                         <Edit className="h-4 w-4" />
@@ -486,7 +523,6 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
 
-
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
             <DialogHeader>
@@ -505,12 +541,20 @@ export default function AdminPage() {
                 <Input id="contact-title" value={contactForm.title} onChange={(e) => setContactForm({...contactForm, title: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-phone" className="text-right">Numéro 1</Label>
-                <Input id="contact-phone" value={contactForm.phone} onChange={(e) => setContactForm({...contactForm, phone: e.target.value})} className="col-span-3" />
+                <Label htmlFor="contact-threeDigits" className="text-right">Num 1 (3 chiffres)</Label>
+                <Input id="contact-threeDigits" value={contactForm.threeDigits} onChange={(e) => setContactForm({...contactForm, threeDigits: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-mobile" className="text-right">Numéro 2</Label>
-                <Input id="contact-mobile" value={contactForm.mobile} onChange={(e) => setContactForm({...contactForm, mobile: e.target.value})} className="col-span-3" />
+                <Label htmlFor="contact-fourDigits" className="text-right">Num 2 (4 chiffres)</Label>
+                <Input id="contact-fourDigits" value={contactForm.fourDigits} onChange={(e) => setContactForm({...contactForm, fourDigits: e.target.value})} className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="contact-fourDigitsXX" className="text-right">Num 3 (4 chiffres)</Label>
+                <Input id="contact-fourDigitsXX" value={contactForm.fourDigitsXX} onChange={(e) => setContactForm({...contactForm, fourDigitsXX: e.target.value})} className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="contact-fourDigitsYY" className="text-right">Num 4 (4 chiffres)</Label>
+                <Input id="contact-fourDigitsYY" value={contactForm.fourDigitsYY} onChange={(e) => setContactForm({...contactForm, fourDigitsYY: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                  <Label htmlFor="structure" className="text-right">Structure</Label>
@@ -531,7 +575,7 @@ export default function AdminPage() {
                <div className="grid grid-cols-4 items-center gap-4">
                  <Label htmlFor="subDepartment" className="text-right">Sous-direction</Label>
                  <Select
-                    value={contactForm.subDepartmentId}
+                    value={contactForm.subDepartmentId || ''}
                     onValueChange={(value) => setContactForm({...contactForm, subDepartmentId: value})}
                     disabled={!contactForm.structureId}
                   >

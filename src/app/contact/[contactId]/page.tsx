@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { allContacts } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumb';
 import {
   Card,
@@ -10,19 +9,35 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Phone, Smartphone, Mail, Building, Briefcase } from 'lucide-react';
+import type { Contact } from '@/lib/types';
+import { PrismaClient } from '@prisma/client';
 
-export async function generateStaticParams() {
-  return allContacts.map((contact) => ({
-    contactId: contact.id,
-  }));
+const prisma = new PrismaClient();
+
+async function getContact(contactId: string): Promise<Contact | null> {
+    const contact = await prisma.contact.findUnique({
+        where: { id: contactId },
+        include: {
+            structure: true,
+            subDepartment: true,
+        }
+    });
+
+    if (!contact) return null;
+
+    return {
+        ...contact,
+        structureName: contact.structure.name,
+        subDepartmentName: contact.subDepartment?.name,
+    };
 }
 
-export default function ContactPage({
+export default async function ContactPage({
   params,
 }: {
   params: { contactId: string };
 }) {
-  const contact = allContacts.find((c) => c.id === params.contactId);
+  const contact = await getContact(params.contactId);
 
   if (!contact) {
     notFound();
@@ -34,15 +49,20 @@ export default function ContactPage({
       label: contact.structureName!,
       href: `/structure/${contact.structureId}`,
     },
-    {
-      label: contact.subDepartmentName!,
-      href: `/structure/${contact.structureId}/${contact.subDepartmentId}`,
-    },
-    {
-      label: contact.name,
-      href: `/contact/${contact.id}`,
-    },
   ];
+
+  if(contact.subDepartmentId && contact.subDepartmentName) {
+    breadcrumbItems.push({
+      label: contact.subDepartmentName,
+      href: `/structure/${contact.structureId}/${contact.subDepartmentId}`,
+    });
+  }
+
+  breadcrumbItems.push({
+    label: contact.name,
+    href: `/contact/${contact.id}`,
+  });
+
 
   return (
     <div className="space-y-8">
@@ -65,16 +85,16 @@ export default function ContactPage({
           <div className="flex items-center gap-4 rounded-lg border p-4">
             <Phone className="h-6 w-6 text-primary" />
             <div>
-              <p className="text-sm text-muted-foreground">Numéro 1</p>
-              <p className="font-medium">{contact.phone}</p>
+              <p className="text-sm text-muted-foreground">Numéro principal</p>
+              <p className="font-medium">{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</p>
             </div>
           </div>
-          {contact.mobile && (
+          {contact.fourDigitsYY && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Smartphone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Numéro 2</p>
-                <p className="font-medium">{contact.mobile}</p>
+                <p className="text-sm text-muted-foreground">Numéro secondaire</p>
+                <p className="font-medium">{contact.fourDigitsYY}</p>
               </div>
             </div>
           )}
@@ -85,13 +105,15 @@ export default function ContactPage({
               <p className="font-medium">{contact.structureName}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 rounded-lg border p-4">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <div>
-              <p className="text-sm text-muted-foreground">Sous-direction</p>
-              <p className="font-medium">{contact.subDepartmentName}</p>
+          {contact.subDepartmentName && (
+            <div className="flex items-center gap-4 rounded-lg border p-4">
+              <Briefcase className="h-6 w-6 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Sous-direction</p>
+                <p className="font-medium">{contact.subDepartmentName}</p>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

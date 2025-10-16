@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./sqlite.db"
+}
+
+model Structure {
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  subDepartments SubDepartment[]
+  contacts      Contact[]
+}
+
+model SubDepartment {
+  id          String    @id @default(cuid())
+  name        String
+  structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structureId String
+  contacts    Contact[]
+}
+
+model Contact {
+  id              String         @id @default(cuid())
+  name            String
+  title           String
+  threeDigits     String?
+  fourDigits      String?
+  fourDigitsXX    String?
+  fourDigitsYY    String?
+  structure       Structure      @relation(fields: [structureId], references: [id])
+  structureId     String
+  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
+  subDepartmentId String?
+}
