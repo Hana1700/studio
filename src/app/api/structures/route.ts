@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name is required' }, { status: 400 });
         }
 
-        const newStructure = await prisma.structure.create({
+        await prisma.structure.create({
             data: {
                 name,
                 description,
@@ -38,12 +38,19 @@ export async function POST(request: Request) {
                     create: subDepartments.map((sdName: string) => ({ name: sdName })),
                 },
             },
-            include: {
-                subDepartments: true,
-            },
         });
 
-        return NextResponse.json(newStructure, { status: 201 });
+        const updatedStructures = await prisma.structure.findMany({
+          include: {
+            subDepartments: {
+              include: {
+                contacts: true,
+              },
+            },
+          },
+        });
+
+        return NextResponse.json(updatedStructures, { status: 201 });
     } catch (error) {
         console.error('Failed to create structure', error);
         return NextResponse.json({ error: 'Failed to create structure' }, { status: 500 });
