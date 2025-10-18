@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/use-auth.tsx';
+import { useAuth } from '@/hooks/use-auth';
 import { AppLogo } from '@/components/icons';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -61,9 +61,7 @@ export default function LoginPage() {
             <Button type="submit" className="w-full">
               Se connecter
             </Button>
-             <div className="text-center text-xs text-muted-foreground pt-4">
-              Le mot de passe par défaut est `admin`.
-            </div>
+            
           </form>
         </CardContent>
       </Card>

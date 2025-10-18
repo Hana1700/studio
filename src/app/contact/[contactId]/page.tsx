@@ -107,7 +107,7 @@ export default async function ContactPage({
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Téléphone (3 chiffres)</p>
+                <p className="text-sm text-muted-foreground">3 chiffres</p>
                 <p className="font-medium">{contact.threeDigits}</p>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default async function ContactPage({
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Téléphone (4 chiffres)</p>
+                <p className="text-sm text-muted-foreground">4 chiffres interne</p>
                 <p className="font-medium">{contact.fourDigits}</p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default async function ContactPage({
              <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Téléphone (Num 3)</p>
+                <p className="text-sm text-muted-foreground">4 chiffres MDN</p>
                 <p className="font-medium">{contact.fourDigitsXX}</p>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default async function ContactPage({
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Smartphone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Mobile (Num 4)</p>
+                <p className="text-sm text-muted-foreground">GSM (4/10 chiffres)</p>
                 <p className="font-medium">{contact.fourDigitsYY}</p>
               </div>
             </div>

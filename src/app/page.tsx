@@ -11,8 +11,7 @@ export default function Home() {
         </h1>
       </div>
       <p className="max-w-xl text-lg text-muted-foreground">
-        Recherchez rapidement des contacts, des services ou des structures au
-        sein de l&apos;entreprise.
+        Recherchez rapidement des contacts, des services ou des structures
       </p>
       <div className="w-full max-w-2xl px-4">
         <SearchBar />
