@@ -8,11 +8,23 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Phone, Smartphone, Mail, Building, Briefcase } from 'lucide-react';
+import { Phone, Smartphone, Building, Briefcase } from 'lucide-react';
 import type { Contact } from '@/lib/types';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// ----------------------------------------------------------------------
+// FIX 1: Prevent multiple PrismaClient instances in development/hot-reloading
+// ----------------------------------------------------------------------
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ['query'],
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// ----------------------------------------------------------------------
 
 async function getContact(contactId: string): Promise<Contact | null> {
     const contact = await prisma.contact.findUnique({
@@ -25,11 +37,13 @@ async function getContact(contactId: string): Promise<Contact | null> {
 
     if (!contact) return null;
 
+    // Type assertion is required as Contact from '@/lib/types' is an extended type
+    // that includes structureName and subDepartmentName.
     return {
         ...contact,
         structureName: contact.structure.name,
         subDepartmentName: contact.subDepartment?.name,
-    };
+    } as Contact;
 }
 
 export default async function ContactPage({
@@ -46,6 +60,7 @@ export default async function ContactPage({
   const breadcrumbItems = [
     { label: 'Accueil', href: '/' },
     {
+      // The `!` is needed because TS can't infer it's not null/undefined even after `if (!contact) notFound()`
       label: contact.structureName!,
       href: `/structure/${contact.structureId}`,
     },
@@ -81,23 +96,57 @@ export default async function ContactPage({
           <CardTitle className="font-headline text-3xl">{contact.name}</CardTitle>
           <CardDescription className="text-lg">{contact.title}</CardDescription>
         </CardHeader>
+        {/*
+          FIX 2: Refactor CardContent to display each digit attribute in a separate "column" (card)
+          The grid-cols-2 is maintained, but now displays all relevant details.
+        */}
         <CardContent className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="flex items-center gap-4 rounded-lg border p-4">
-            <Phone className="h-6 w-6 text-primary" />
-            <div>
-              <p className="text-sm text-muted-foreground">Numéro principal</p>
-              <p className="font-medium">{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</p>
+
+          {/* New Card for threeDigits */}
+          {contact.threeDigits && (
+            <div className="flex items-center gap-4 rounded-lg border p-4">
+              <Phone className="h-6 w-6 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Téléphone (3 chiffres)</p>
+                <p className="font-medium">{contact.threeDigits}</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* New Card for fourDigits */}
+          {contact.threeDigits && (
+            <div className="flex items-center gap-4 rounded-lg border p-4">
+              <Phone className="h-6 w-6 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Téléphone (4 chiffres)</p>
+                <p className="font-medium">{contact.fourDigits}</p>
+              </div>
+            </div>
+          )}
+
+          {/* New Card for fourDigitsXX */}
+          {contact.fourDigitsXX && (
+             <div className="flex items-center gap-4 rounded-lg border p-4">
+              <Phone className="h-6 w-6 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Téléphone (Num 3)</p>
+                <p className="font-medium">{contact.fourDigitsXX}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* New Card for fourDigitsYY (Secondary/Mobile) */}
           {contact.fourDigitsYY && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Smartphone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">Numéro secondaire</p>
+                <p className="text-sm text-muted-foreground">Mobile (Num 4)</p>
                 <p className="font-medium">{contact.fourDigitsYY}</p>
               </div>
             </div>
           )}
+
+           {/* Structure Card */}
            <div className="flex items-center gap-4 rounded-lg border p-4">
             <Building className="h-6 w-6 text-primary" />
             <div>
@@ -105,6 +154,8 @@ export default async function ContactPage({
               <p className="font-medium">{contact.structureName}</p>
             </div>
           </div>
+
+          {/* Sub-department Card */}
           {contact.subDepartmentName && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Briefcase className="h-6 w-6 text-primary" />
