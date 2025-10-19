@@ -405,7 +405,7 @@ export default function AdminPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Nom</TableHead>
-                                    <TableHead>Service</TableHead>
+                                    <TableHead>Sous-direction</TableHead>
                                     <TableHead>Téléphone</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
@@ -550,19 +550,19 @@ export default function AdminPage() {
                 <Input id="contact-title" value={contactForm.title} onChange={(e) => setContactForm({...contactForm, title: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-threeDigits" className="text-right">Num 1 (3 chiffres)</Label>
+                <Label htmlFor="contact-threeDigits" className="text-right">3 chiffres</Label>
                 <Input id="contact-threeDigits" value={contactForm.threeDigits} onChange={(e) => setContactForm({...contactForm, threeDigits: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-fourDigits" className="text-right">Num 2 (4 chiffres)</Label>
+                <Label htmlFor="contact-fourDigits" className="text-right">4 chiffres</Label>
                 <Input id="contact-fourDigits" value={contactForm.fourDigits} onChange={(e) => setContactForm({...contactForm, fourDigits: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-fourDigitsXX" className="text-right">Num 3 (4 chiffres)</Label>
+                <Label htmlFor="contact-fourDigitsXX" className="text-right">4 chiffres MDN</Label>
                 <Input id="contact-fourDigitsXX" value={contactForm.fourDigitsXX} onChange={(e) => setContactForm({...contactForm, fourDigitsXX: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contact-fourDigitsYY" className="text-right">Num 4 (4 chiffres)</Label>
+                <Label htmlFor="contact-fourDigitsYY" className="text-right">GSM (4/10 chiffres)</Label>
                 <Input id="contact-fourDigitsYY" value={contactForm.fourDigitsYY} onChange={(e) => setContactForm({...contactForm, fourDigitsYY: e.target.value})} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">

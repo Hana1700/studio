@@ -102,7 +102,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Service</TableHead>
+                  <TableHead>Sous-direction</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead>3 chiffres</TableHead>
                   <TableHead>4 chiffres</TableHead>
