@@ -11,10 +11,11 @@ datasource db {
 }
 
 model Structure {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
   subDepartments SubDepartment[]
+  Contact        Contact[]
 }
 
 model SubDepartment {
@@ -33,6 +34,7 @@ model Contact {
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
+  structure       Structure      @relation(fields: [structureId], references: [id])
   structureId     String
   subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
   subDepartmentId String?
