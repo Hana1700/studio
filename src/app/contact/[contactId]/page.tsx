@@ -129,7 +129,7 @@ export default async function ContactPage({
              <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
               <div>
-                <p className="text-sm text-muted-foreground">4 chiffres MDN</p>
+                <p className="text-sm text-muted-foreground">4 chiffres YYY</p>
                 <p className="font-medium">{contact.fourDigitsXX}</p>
               </div>
             </div>

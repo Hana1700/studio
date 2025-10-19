@@ -104,10 +104,10 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
                 <TableRow>
                   <TableHead>Service</TableHead>
                   <TableHead>Nom</TableHead>
-                  <TableHead>Numéro 1</TableHead>
-                  <TableHead>Numéro 2</TableHead>
-                  <TableHead>Numéro 3</TableHead>
-                  <TableHead>Numéro 4</TableHead>
+                  <TableHead>3 chiffres</TableHead>
+                  <TableHead>4 chiffres</TableHead>
+                  <TableHead>4 chiffres YYY</TableHead>
+                  <TableHead>GSM (4/10 chiffres)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
