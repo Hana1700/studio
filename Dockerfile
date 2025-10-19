@@ -1,44 +1,42 @@
-# Étape 1: Builder l'application
-FROM node:20-alpine AS builder
-
-# Définir le répertoire de travail
+# 1. Installer les dépendances et construire l'application
+FROM node:20-slim AS builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 WORKDIR /app
-
-# Copier les fichiers de dépendances
-COPY package.json ./
-
-# Installer les dépendances
-# Nous installons toutes les dépendances (y compris dev) car `prisma generate` en a besoin
+COPY package*.json ./
+# Installer toutes les dépendances, y compris devDependencies pour le build et le seed
 RUN npm install
-
-# Copier le reste du code de l'application
 COPY . .
-
-# Générer le client Prisma (essentiel pour la construction)
 RUN npx prisma generate
-
-# Construire l'application pour la production
 RUN npm run build
 
-# ---
-
-# Étape 2: Créer l'image de production
-FROM node:20-alpine AS runner
-
+# 2. Créer l'image finale de production
+FROM node:20-slim AS runner
 WORKDIR /app
 
-# Ne pas exécuter en tant que root
-USER node
-
-# Copier uniquement les artefacts nécessaires depuis l'étape de build
+# Copier les dépendances de production
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package*.json ./
 
-# Exposer le port sur lequel l'application s'exécutera
+# Copier le client Prisma généré
+COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+
+# Copier les fichiers de build de Next.js
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+# Copier le schéma Prisma et le script de seed
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/node_modules/ts-node ./node_modules/ts-node
+COPY --from=builder /app/node_modules/typescript ./node_modules/typescript
+COPY --from=builder /app/node_modules/@types ./node_modules/@types
+COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
+
+
 EXPOSE 3000
 
-# Commande pour démarrer l'application
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start"]
