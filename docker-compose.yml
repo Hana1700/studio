@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: annuaire-app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./dev.db
+    volumes:
+      # Monte le fichier de base de données pour la persistance des données
+      - ./prisma/dev.db:/app/prisma/dev.db
+    command: >
+      sh -c "npx prisma migrate deploy && npm run start"
