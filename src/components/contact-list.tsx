@@ -106,7 +106,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
                   <TableHead>Nom</TableHead>
                   <TableHead>3 chiffres</TableHead>
                   <TableHead>4 chiffres</TableHead>
-                  <TableHead>4 chiffres YYY</TableHead>
+                  <TableHead>4 chiffres MDN</TableHead>
                   <TableHead>GSM (4/10 chiffres)</TableHead>
                 </TableRow>
               </TableHeader>
