@@ -21,7 +21,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut, KeyRound } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -37,17 +37,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 
 export default function AdminPage() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   
   const [structures, setStructures] = useState<Structure[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   
   const [newStructureName, setNewStructureName] = useState('');
   const [newStructureDescription, setNewStructureDescription] = useState('');
@@ -55,6 +59,13 @@ export default function AdminPage() {
   const [parentStructureId, setParentStructureId] = useState('');
 
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
   
   const [contactForm, setContactForm] = useState({
     id: '',
@@ -80,7 +91,9 @@ export default function AdminPage() {
       ]);
       if (structuresRes.ok) {
         const structuresData = await structuresRes.json();
-        setStructures(structuresData);
+        if (Array.isArray(structuresData)) {
+           setStructures(structuresData);
+        }
       }
       if (contactsRes.ok) {
         const contactsData = await contactsRes.json();
@@ -234,6 +247,41 @@ export default function AdminPage() {
     setIsSubDepartmentDialogOpen(false);
   };
 
+  const handleChangePassword = async () => {
+    setPasswordError('');
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('Les nouveaux mots de passe ne correspondent pas.');
+      return;
+    }
+    if (!user) {
+      setPasswordError('Utilisateur non trouvé.');
+      return;
+    }
+
+    const response = await fetch('/api/admin/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: user.username,
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast({
+        title: 'Succès',
+        description: 'Votre mot de passe a été changé avec succès.',
+      });
+      setIsPasswordDialogOpen(false);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } else {
+      setPasswordError(data.error || 'Une erreur est survenue.');
+    }
+  };
+
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
 
   if (!isAuthenticated) {
@@ -243,13 +291,22 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Administrateur
-        </h1>
-        <Button variant="outline" onClick={logout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Déconnexion
-        </Button>
+        <div>
+           <h1 className="font-headline text-3xl font-bold tracking-tight">
+            Administrateur
+          </h1>
+          <p className="text-muted-foreground">Connecté en tant que {user?.username}</p>
+        </div>
+        <div>
+          <Button variant="outline" className="mr-2" onClick={() => setIsPasswordDialogOpen(true)}>
+            <KeyRound className="mr-2 h-4 w-4" />
+            Changer le mot de passe
+          </Button>
+          <Button variant="outline" onClick={logout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
+          </Button>
+        </div>
       </div>
 
        <Card>
@@ -546,6 +603,67 @@ export default function AdminPage() {
               <Button variant="outline" onClick={handleCancelContact}>Annuler</Button>
               <Button onClick={handleSaveContact}>Enregistrer</Button>
             </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Changer le mot de passe</DialogTitle>
+            <DialogDescription>
+              Mettez à jour votre mot de passe administrateur ici.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="current-password"रियायत className="text-right">
+                Actuel
+              </Label>
+              <Input
+                id="current-password"
+                type="password"
+                className="col-span-3"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-password"रियायत className="text-right">
+                Nouveau
+              </Label>
+              <Input
+                id="new-password"
+                type="password"
+                className="col-span-3"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="confirm-password"रियायत className="text-right">
+                Confirmer
+              </Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                className="col-span-3"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              />
+            </div>
+             {passwordError && (
+                <Alert variant="destructive" className="col-span-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                        {passwordError}
+                    </AlertDescription>
+                </Alert>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Annuler</Button>
+            <Button type="submit" onClick={handleChangePassword}>Enregistrer</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

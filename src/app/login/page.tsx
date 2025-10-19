@@ -12,17 +12,24 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(password)) {
+    setError('');
+    setIsLoading(true);
+    const result = await login(username, password);
+    setIsLoading(false);
+
+    if (result.success) {
       router.push('/admin');
     } else {
-      setError('Mot de passe incorrect.');
+      setError(result.error || 'Une erreur est survenue.');
     }
   };
 
@@ -35,11 +42,21 @@ export default function LoginPage() {
                 <CardTitle className="text-3xl font-headline">Annuaire</CardTitle>
             </div>
           <CardDescription>
-            Veuillez entrer le mot de passe pour accéder à la section administrateur.
+            Veuillez entrer vos identifiants pour accéder à la section administrateur.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
+             <div className="space-y-2">
+              <Label htmlFor="username">Nom d'utilisateur</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
               <Input
@@ -58,8 +75,8 @@ export default function LoginPage() {
                     </AlertDescription>
                 </Alert>
             )}
-            <Button type="submit" className="w-full">
-              Se connecter
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
             
           </form>

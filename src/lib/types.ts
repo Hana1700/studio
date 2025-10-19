@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Structure as PrismaStructure, SubDepartment as PrismaSubDepartment, Contact as PrismaContact } from '@prisma/client';
+import { Structure as PrismaStructure, SubDepartment as PrismaSubDepartment, Contact as PrismaContact, Admin as PrismaAdmin } from '@prisma/client';
 
 export type Contact = PrismaContact & {
   structureName?: string;
@@ -16,3 +16,5 @@ export type SubDepartment = PrismaSubDepartment & {
 export type Structure = PrismaStructure & {
   subDepartments: SubDepartment[];
 };
+
+export type Admin = PrismaAdmin;

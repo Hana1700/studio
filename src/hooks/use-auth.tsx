@@ -4,69 +4,100 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { useRouter, usePathname } from 'next/navigation';
 
 const AUTH_KEY = 'annuaire-auth-status';
-const ADMIN_PASSWORD = 'admin'; // Simple hardcoded password
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (password: string) => boolean;
+  user: { username: string } | null;
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  checkAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<{ username: string } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    try {
-        const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
-        setIsAuthenticated(isAuth);
+  const checkAuth = () => {
+     try {
+        const authData = localStorage.getItem(AUTH_KEY);
+        if (authData) {
+            const parsedData = JSON.parse(authData);
+            if(parsedData.isAuthenticated) {
+                setIsAuthenticated(true);
+                setUser({ username: parsedData.username });
+            } else {
+                setIsAuthenticated(false);
+                setUser(null);
+                localStorage.removeItem(AUTH_KEY);
+            }
+        } else {
+            setIsAuthenticated(false);
+            setUser(null);
+        }
     } catch (error) {
-        // localStorage is not available
         setIsAuthenticated(false);
+        setUser(null);
     }
+  }
+
+  useEffect(() => {
+    checkAuth();
   }, []);
 
-  const login = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      try {
-        localStorage.setItem(AUTH_KEY, 'true');
-      } catch (error) {
-        // localStorage is not available
-      }
-      setIsAuthenticated(true);
-      return true;
+  const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        try {
+            localStorage.setItem(AUTH_KEY, JSON.stringify({ isAuthenticated: true, username: data.username }));
+        } catch (error) {
+            // local storage not available
+        }
+        setIsAuthenticated(true);
+        setUser({ username: data.username });
+        return { success: true };
+    } else {
+        return { success: false, error: data.error };
     }
-    return false;
   };
 
   const logout = () => {
     try {
         localStorage.removeItem(AUTH_KEY);
     } catch (error) {
-        // localStorage is not available
+        // local storage not available
     }
     setIsAuthenticated(false);
+    setUser(null);
     router.push('/login');
   };
   
   useEffect(() => {
     try {
-        const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
-        if (!isAuth && pathname === '/admin') {
+        const authData = localStorage.getItem(AUTH_KEY);
+        const isAuth = authData ? JSON.parse(authData).isAuthenticated : false;
+        if (!isAuth && pathname.startsWith('/admin')) {
           router.push('/login');
         }
     } catch(e) {
-        if (pathname === '/admin') {
+        if (pathname.startsWith('/admin')) {
           router.push('/login');
         }
     }
   }, [pathname, router]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,27 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient()
 
 async function main() {
+  console.log('Seeding database...');
+
+  // Clear existing data
+  await prisma.contact.deleteMany();
+  await prisma.subDepartment.deleteMany();
+  await prisma.structure.deleteMany();
+  await prisma.admin.deleteMany();
+
+  // Seed Admin
+  const hashedPassword = await bcrypt.hash('admin', 10);
+  await prisma.admin.create({
+    data: {
+      username: 'admin',
+      password: hashedPassword,
+    },
+  });
+  console.log('Admin user created.');
+
   const s1 = await prisma.structure.create({
     data: {
       name: 'Direction de ....',
@@ -233,6 +252,7 @@ async function main() {
     await prisma.subDepartment.create({ data: { name: 'Sous-direction de...', structureId: s.id } });
   }
 
+  console.log('Seeding finished.');
 }
 
 main()
