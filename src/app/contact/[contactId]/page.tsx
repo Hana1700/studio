@@ -58,7 +58,7 @@ export default async function ContactPage({
   }
 
   const breadcrumbItems = [
-    { label: 'Accueil', href: '/' },
+    { label: 'Parcourir', href: '/browse' },
     {
       // The `!` is needed because TS can't infer it's not null/undefined even after `if (!contact) notFound()`
       label: contact.structureName!,

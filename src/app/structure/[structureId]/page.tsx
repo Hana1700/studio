@@ -1,13 +1,15 @@
 import { notFound } from 'next/navigation';
 import { Breadcrumbs } from '@/components/breadcrumb';
 import { SubDepartmentList } from '@/components/sub-department-list';
-import type { Structure } from '@/lib/types';
+import type { Structure, Contact } from '@/lib/types';
 import { PrismaClient } from '@prisma/client';
 import { Building } from 'lucide-react';
+import { ContactList } from '@/components/contact-list';
+import { Separator } from '@/components/ui/separator';
 
 const prisma = new PrismaClient();
 
-async function getStructure(structureId: string): Promise<Structure | null> {
+async function getStructure(structureId: string): Promise<(Structure & { directContacts: Contact[] }) | null> {
     const structure = await prisma.structure.findUnique({
         where: { id: structureId },
         include: {
@@ -23,8 +25,27 @@ async function getStructure(structureId: string): Promise<Structure | null> {
 
     if (!structure) return null;
 
+    const directContacts = await prisma.contact.findMany({
+        where: {
+            structureId: structureId,
+            subDepartmentId: null,
+        },
+        include: {
+            structure: true,
+            subDepartment: true,
+        }
+    });
+    
+    const formattedContacts = directContacts.map(c => ({
+        ...c,
+        structureName: c.structure.name,
+        subDepartmentName: c.subDepartment?.name
+    }));
+
+
     return {
         ...structure,
+        directContacts: formattedContacts,
         icon: Building,
         subDepartments: structure.subDepartments.map(sd => ({
             ...sd,
@@ -48,7 +69,7 @@ export default async function StructurePage({
   }
 
   const breadcrumbItems = [
-    { label: 'Accueil', href: '/' },
+    { label: 'Parcourir', href: '/browse' },
     { label: structure.name, href: `/structure/${structure.id}` },
   ];
 
@@ -61,7 +82,20 @@ export default async function StructurePage({
         </h1>
         <p className="mt-1 text-muted-foreground">{structure.description}</p>
       </div>
-      <SubDepartmentList structure={structure} />
+
+      <div className="space-y-8">
+        <div>
+            <h2 className="text-2xl font-bold mb-4">Sous-directions</h2>
+            <SubDepartmentList structure={structure} />
+        </div>
+        
+        <Separator />
+        
+        <div>
+            <h2 className="text-2xl font-bold mb-4">Contacts directs</h2>
+            <ContactList contacts={structure.directContacts} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -3,10 +3,7 @@ import { AppHeader } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
 import { AuthProvider } from '@/hooks/use-auth.tsx';
-import { PageContainer } from '@/components/page-container';
 
 export const metadata: Metadata = {
   title: 'Annuaire téléphonique de......',
@@ -34,21 +31,14 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <SidebarProvider defaultOpen={true}>
-              <Sidebar side="left">
-                <SidebarContent>
-                  <AppSidebar />
-                </SidebarContent>
-              </Sidebar>
-              <PageContainer>
-                <AppHeader />
-                <main className="flex flex-1 justify-center py-8">
-                  <div className="container w-full">
-                    {children}
-                  </div>
-                </main>
-              </PageContainer>
-          </SidebarProvider>
+          <div className="flex flex-col min-h-screen">
+            <AppHeader />
+            <main className="flex flex-1 justify-center py-8">
+              <div className="container w-full">
+                {children}
+              </div>
+            </main>
+          </div>
         </AuthProvider>
         <Toaster />
       </body>
