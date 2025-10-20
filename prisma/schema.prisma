@@ -1,31 +1,38 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
 }
 
 model Structure {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
   subDepartments SubDepartment[]
-  contacts      Contact[]
-  displayOrder  Int             @default(0)
+  contacts       Contact[]
+  displayOrder   Int             @default(0)
 }
 
 model SubDepartment {
-  id          String    @id @default(cuid())
-  name        String
-  structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  structureId String
-  contacts    Contact[]
-  displayOrder  Int       @default(0)
+  id           String    @id @default(cuid())
+  name         String
+  structure    Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structureId  String
+  contacts     Contact[]
+  displayOrder Int       @default(0)
 }
 
 model Contact {
@@ -36,17 +43,9 @@ model Contact {
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
-  structure       Structure      @relation(fields: [structureId], references: [id])
+  structure       Structure      @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId     String
-  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: SetNull)
+  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
   subDepartmentId String?
   displayOrder    Int            @default(0)
-}
-
-model Admin {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
