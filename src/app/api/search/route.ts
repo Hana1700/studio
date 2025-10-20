@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { GRADE_ORDER } from '@/lib/config';
+import type { Contact } from '@/lib/types';
 
 // Use caching for PrismaClient in Next.js environment
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -24,7 +26,7 @@ export async function GET(request: Request) {
   // case-insensitive for text fields, or we would need to use raw SQL.
 
   try {
-    const contacts = await prisma.contact.findMany({
+    const contacts: Contact[] = await prisma.contact.findMany({
       where: {
         OR: [
           // REMOVED: mode: 'insensitive' from name
@@ -47,6 +49,27 @@ export async function GET(request: Request) {
         structure: true,
         subDepartment: true,
       },
+    });
+
+    // Custom sort based on GRADE_ORDER
+    contacts.sort((a, b) => {
+      const indexA = GRADE_ORDER.indexOf(a.title);
+      const indexB = GRADE_ORDER.indexOf(b.title);
+
+      // If both titles are in GRADE_ORDER, sort by their index
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      // If only contact A's title is in GRADE_ORDER, it comes first
+      if (indexA !== -1) {
+        return -1;
+      }
+      // If only contact B's title is in GRADE_ORDER, it comes first
+      if (indexB !== -1) {
+        return 1;
+      }
+      // If neither title is in GRADE_ORDER, keep their original relative order (or sort alphabetically by name)
+      return a.name.localeCompare(b.name);
     });
 
     const formattedContacts = contacts.map(c => ({

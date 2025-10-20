@@ -1,39 +1,37 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "debian-openssl-3.0.x"]
-}
-
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model Structure {
-  id             String          @id @default(cuid())
-  name           String
-  description    String?
-  displayOrder   Int?
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
   subDepartments SubDepartment[]
-  contacts       Contact[]
+  contacts      Contact[]
+  displayOrder  Int             @default(0)
 }
 
 model SubDepartment {
-  id           String    @id @default(cuid())
-  name         String
-  displayOrder Int?
-  structure    Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  structureId  String
-  contacts     Contact[]
+  id          String    @id @default(cuid())
+  name        String
+  structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structureId String
+  contacts    Contact[]
+  displayOrder Int      @default(0)
 }
 
 model Contact {
   id              String         @id @default(cuid())
   name            String
   title           String
-  displayOrder    Int?
   threeDigits     String?
   fourDigits      String?
   fourDigitsXX    String?
@@ -42,6 +40,7 @@ model Contact {
   structureId     String
   subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: Cascade)
   subDepartmentId String?
+  displayOrder    Int            @default(0)
 }
 
 model Admin {
