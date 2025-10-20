@@ -1,57 +1,65 @@
-# 1. Installer les dépendances et construire l'application
+# Étape 1: Construire l'application
 FROM node:20-slim AS builder
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+
+# Définir l'environnement
+ENV NODE_ENV=production
+
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Step 1: Copy metadata first to leverage Docker cache
-COPY package*.json ./
+# Installer les dépendances système nécessaires pour le build
+# Et la librairie manquante pour Prisma
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl wget && \
+    wget http://ftp.br.debian.org/debian/pool/main/o/openssl/libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    dpkg -i libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    rm libssl1.1_1.1.1w-0+deb11u1_amd64.deb
 
-# Step 2: Copy the Prisma schema. This MUST happen before `npm install`
-# because the `postinstall` script runs `prisma generate`.
-COPY prisma ./prisma
+# Copier les fichiers de dépendances et de schéma Prisma
+COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 
-# Installer toutes les dépendances, y compris devDependencies pour le build et le seed
-# This step automatically runs 'prisma generate' via the postinstall script.
-RUN npm install
+# Installer les dépendances de production
+RUN npm install --omit=dev
 
-# Step 3: Copy the rest of the application files
+# Générer le client Prisma (important de le faire ici)
+RUN npx prisma generate
+
+# Copier le reste du code de l'application
 COPY . .
 
-# Step 4: Run the build
+# Construire l'application
 RUN npm run build
 
-# 2. Créer l'image finale de production
+# Étape 2: Créer l'image de production finale
 FROM node:20-slim AS runner
+
+# Définir l'environnement
+ENV NODE_ENV=production
+
+# Définir le répertoire de travail
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y openssl \
-    # Clean up apt caches to keep the image small
-    && rm -rf /var/lib/apt/lists/*
+# Installer les dépendances système nécessaires pour l'exécution
+# Et la librairie manquante pour Prisma
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl wget && \
+    wget http://ftp.br.debian.org/debian/pool/main/o/openssl/libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    dpkg -i libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    rm libssl1.1_1.1.1w-0+deb11u1_amd64.deb
 
-# Copier les dépendances de production
+
+# Copier uniquement les dépendances de production
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 
-# Copier les fichiers générés
+# Copier l'application construite
 COPY --from=builder /app/.next ./.next
-#COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/public ./public
 
-# The following copies are often *not* necessary if the entire node_modules
-# is copied, but we'll keep them to align with your original intent
-# of ensuring these development-related tools are present for `db seed`.
-COPY --from=builder /app/node_modules/ts-node ./node_modules/ts-no
-COPY --from=builder /app/node_modules/typescript ./node_modules/typescript
-COPY --from=builder /app/node_modules/@types ./node_modules/@types
-COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
-COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
+# Exposer le port
 EXPOSE 3000
 
-# Run migrations, seed the database, and start the application
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+# Définir la commande de démarrage
+CMD ["npm", "run", "start"]

@@ -52,7 +52,7 @@ export default async function SubDepartmentPage({
   }
 
   const breadcrumbItems = [
-    { label: 'Parcourir', href: '/browse' },
+    { label: 'Accueil', href: '/' },
     { label: structure.name, href: `/structure/${structure.id}` },
     {
       label: subDepartment.name,

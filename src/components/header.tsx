@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { AppLogo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
-import { BookMarked } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 export function AppHeader() {
   return (
@@ -27,9 +27,9 @@ export function AppHeader() {
 
         <div className="flex items-center justify-end space-x-2">
            <Button variant="outline" asChild>
-              <Link href="/browse">
-                <BookMarked className="mr-2 h-4 w-4" />
-                Parcourir
+              <Link href="/">
+                <Home className="mr-2 h-4 w-4" />
+                Accueil
               </Link>
             </Button>
           <nav className="flex items-center">

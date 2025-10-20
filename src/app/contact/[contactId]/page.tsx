@@ -12,19 +12,14 @@ import { Phone, Smartphone, Building, Briefcase } from 'lucide-react';
 import type { Contact } from '@/lib/types';
 import { PrismaClient } from '@prisma/client';
 
-// ----------------------------------------------------------------------
-// FIX 1: Prevent multiple PrismaClient instances in development/hot-reloading
-// ----------------------------------------------------------------------
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =
   globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ['query'],
-  });
+  new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
-// ----------------------------------------------------------------------
+
 
 async function getContact(contactId: string): Promise<Contact | null> {
     const contact = await prisma.contact.findUnique({
@@ -37,8 +32,6 @@ async function getContact(contactId: string): Promise<Contact | null> {
 
     if (!contact) return null;
 
-    // Type assertion is required as Contact from '@/lib/types' is an extended type
-    // that includes structureName and subDepartmentName.
     return {
         ...contact,
         structureName: contact.structure.name,
@@ -58,9 +51,8 @@ export default async function ContactPage({
   }
 
   const breadcrumbItems = [
-    { label: 'Parcourir', href: '/browse' },
+    { label: 'Accueil', href: '/' },
     {
-      // The `!` is needed because TS can't infer it's not null/undefined even after `if (!contact) notFound()`
       label: contact.structureName!,
       href: `/structure/${contact.structureId}`,
     },
@@ -96,13 +88,8 @@ export default async function ContactPage({
           <CardTitle className="font-headline text-3xl">{contact.name}</CardTitle>
           <CardDescription className="text-lg">{contact.title}</CardDescription>
         </CardHeader>
-        {/*
-          FIX 2: Refactor CardContent to display each digit attribute in a separate "column" (card)
-          The grid-cols-2 is maintained, but now displays all relevant details.
-        */}
         <CardContent className="mt-6 grid gap-4 md:grid-cols-2">
 
-          {/* New Card for threeDigits */}
           {contact.threeDigits && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
@@ -113,8 +100,7 @@ export default async function ContactPage({
             </div>
           )}
 
-          {/* New Card for fourDigits */}
-          {contact.threeDigits && (
+          {contact.fourDigits && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
               <div>
@@ -124,7 +110,6 @@ export default async function ContactPage({
             </div>
           )}
 
-          {/* New Card for fourDigitsXX */}
           {contact.fourDigitsXX && (
              <div className="flex items-center gap-4 rounded-lg border p-4">
               <Phone className="h-6 w-6 text-primary" />
@@ -135,7 +120,6 @@ export default async function ContactPage({
             </div>
           )}
           
-          {/* New Card for fourDigitsYY (Secondary/Mobile) */}
           {contact.fourDigitsYY && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Smartphone className="h-6 w-6 text-primary" />
@@ -146,7 +130,6 @@ export default async function ContactPage({
             </div>
           )}
 
-           {/* Structure Card */}
            <div className="flex items-center gap-4 rounded-lg border p-4">
             <Building className="h-6 w-6 text-primary" />
             <div>
@@ -155,7 +138,6 @@ export default async function ContactPage({
             </div>
           </div>
 
-          {/* Sub-department Card */}
           {contact.subDepartmentName && (
             <div className="flex items-center gap-4 rounded-lg border p-4">
               <Briefcase className="h-6 w-6 text-primary" />

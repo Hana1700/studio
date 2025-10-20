@@ -4,19 +4,13 @@ import { useState } from 'react';
 import type { Contact } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
   Phone,
   Smartphone,
   Search,
+  Building,
+  Briefcase
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import Link from 'next/link';
 
@@ -25,7 +19,7 @@ function ContactCard({ contact }: { contact: Contact }) {
 
   return (
     <Link href={contactLink} className="block">
-      <Card>
+      <Card className="h-full hover:shadow-md transition-shadow">
         <CardHeader className="flex flex-row items-center gap-4">
           <Avatar>
             <AvatarFallback>
@@ -37,13 +31,23 @@ function ContactCard({ contact }: { contact: Contact }) {
           </Avatar>
           <div>
             <CardTitle className="font-headline text-lg">{contact.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{contact.title}</p>
+            <CardDescription>{contact.title}</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
+        <CardContent className="space-y-2 text-sm">
+           <div className="flex items-center gap-2 text-muted-foreground">
+                <Building className="h-4 w-4" />
+                <span>{contact.structureName}</span>
+            </div>
+             {contact.subDepartmentName && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <Briefcase className="h-4 w-4" />
+                    <span>{contact.subDepartmentName}</span>
+                </div>
+             )}
           <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
             <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</span>
+            <span className="truncate">{`${contact.threeDigits || ''} ${contact.fourDigits || ''} ${contact.fourDigitsXX || ''}`.trim()}</span>
           </div>
           {contact.fourDigitsYY && (
             <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
@@ -82,7 +86,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Filtrer par direction, service, nom, poste..."
+          placeholder="Filtrer les contacts affichés..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full max-w-sm pl-9"
@@ -90,71 +94,14 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
       </div>
 
       {filteredContacts.length > 0 ? (
-        <>
-          {/* Mobile View */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {filteredContacts.map((contact) => (
-              <ContactCard key={contact.id} contact={contact} />
-            ))}
-          </div>
-
-          {/* Desktop View */}
-          <Card className="hidden md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Direction</TableHead>
-                  <TableHead>Sous-direction</TableHead>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>3 chiffres</TableHead>
-                  <TableHead>4 chiffres</TableHead>
-                  <TableHead>4 chiffres MDN</TableHead>
-                  <TableHead>GSM (4/10 chiffres)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredContacts.map((contact) => {
-                  const contactLink = `/contact/${contact.id}`;
-                  
-                  const CellComponent = Link;
-                  const cellProps = { href: contactLink };
-
-                  return (
-                    <TableRow key={contact.id} className={'cursor-pointer'}>
-                      <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.structureName}</CellComponent>
-                      </TableCell>
-                       <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.subDepartmentName || '-'}</CellComponent>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <CellComponent {...cellProps} className="block hover:text-primary">
-                          <div>{contact.name}</div>
-                          <div className="text-sm text-muted-foreground">{contact.title}</div>
-                        </CellComponent>
-                      </TableCell>
-                      <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.threeDigits}</CellComponent>
-                      </TableCell>
-                       <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigits}</CellComponent>
-                      </TableCell>
-                       <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigitsXX}</CellComponent>
-                      </TableCell>
-                      <TableCell>
-                        {contact.fourDigitsYY ? <CellComponent {...cellProps} className="block hover:text-primary">{contact.fourDigitsYY}</CellComponent> : <span className="text-muted-foreground">-</span>}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </Card>
-        </>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredContacts.map((contact) => (
+            <ContactCard key={contact.id} contact={contact} />
+          ))}
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 py-24 text-center">
-            <p className="text-muted-foreground">Aucun contact ne correspond à votre recherche.</p>
+            <p className="text-muted-foreground">Aucun contact ne correspond à votre filtre.</p>
         </div>
       )}
     </div>
