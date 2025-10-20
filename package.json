@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "PRISMA_CLIENT_ENGINE_TYPE=\"dataproxy\" next dev --turbopack -p 9002",
-    "build": "PRISMA_CLIENT_ENGINE_TYPE=\"dataproxy\" NODE_ENV=production next build",
-    "start": "PRISMA_CLIENT_ENGINE_TYPE=\"dataproxy\" next start",
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate"

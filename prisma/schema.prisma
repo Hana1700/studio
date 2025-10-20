@@ -25,7 +25,7 @@ model SubDepartment {
   structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId String
   contacts    Contact[]
-  displayOrder Int      @default(0)
+  displayOrder  Int       @default(0)
 }
 
 model Contact {
@@ -36,15 +36,17 @@ model Contact {
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
-  structure       Structure      @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structure       Structure      @relation(fields: [structureId], references: [id])
   structureId     String
-  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: Cascade)
+  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: SetNull)
   subDepartmentId String?
   displayOrder    Int            @default(0)
 }
 
 model Admin {
-  id       String @id @default(cuid())
-  username String @unique
-  password String
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
