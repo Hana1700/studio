@@ -34,8 +34,8 @@ function ContactCard({ contact }: { contact: Contact }) {
             <CardDescription>{contact.title}</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-           <div className="flex items-center gap-2 text-muted-foreground">
+        <CardContent className="grid grid-cols-1 gap-2 text-sm">
+           <div className="flex items-center gap-2 text-muted-foreground pt-2 border-t">
                 <Building className="h-4 w-4" />
                 <span>{contact.structureName}</span>
             </div>
@@ -45,16 +45,45 @@ function ContactCard({ contact }: { contact: Contact }) {
                     <span>{contact.subDepartmentName}</span>
                 </div>
              )}
-          <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{`${contact.threeDigits || ''} ${contact.fourDigits || ''} ${contact.fourDigitsXX || ''}`.trim()}</span>
+          
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+            {contact.threeDigits && (
+                <div className="flex items-center gap-2 rounded-lg bg-muted p-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <div>
+                    <p className="text-xs text-muted-foreground">3 chiffres</p>
+                    <p className="font-medium">{contact.threeDigits}</p>
+                </div>
+                </div>
+            )}
+            {contact.fourDigits && (
+                <div className="flex items-center gap-2 rounded-lg bg-muted p-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <div>
+                    <p className="text-xs text-muted-foreground">4 chiffres</p>
+                    <p className="font-medium">{contact.fourDigits}</p>
+                </div>
+                </div>
+            )}
+            {contact.fourDigitsXX && (
+                <div className="flex items-center gap-2 rounded-lg bg-muted p-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <div>
+                    <p className="text-xs text-muted-foreground">4 chiffres MDN</p>
+                    <p className="font-medium">{contact.fourDigitsXX}</p>
+                </div>
+                </div>
+            )}
+            {contact.fourDigitsYY && (
+                <div className="flex items-center gap-2 rounded-lg bg-muted p-2">
+                <Smartphone className="h-4 w-4 text-muted-foreground" />
+                 <div>
+                    <p className="text-xs text-muted-foreground">GSM</p>
+                    <p className="font-medium">{contact.fourDigitsYY}</p>
+                </div>
+                </div>
+            )}
           </div>
-          {contact.fourDigitsYY && (
-            <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
-              <Smartphone className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{contact.fourDigitsYY}</span>
-            </div>
-          )}
         </CardContent>
       </Card>
     </Link>
