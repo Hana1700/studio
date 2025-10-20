@@ -8,7 +8,6 @@ services:
       - "3000:3000"
     volumes:
       # Monte un volume pour la persistance de la base de données SQLite
-      - ./prisma:/app/prisma
-    # La commande est maintenant gérée par le Dockerfile pour plus de cohérence
-    # et pour s'assurer que l'environnement est correctement configuré.
       - ./data/dev.db:/app/prisma/dev.db
+    # La commande exécute maintenant la migration, le seeding, puis démarre l'application.
+    command: sh -c "npx prisma db push && npx prisma db seed && npm run start"
