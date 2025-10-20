@@ -9,10 +9,20 @@ export async function GET() {
     const structures = await prisma.structure.findMany({
       include: {
         subDepartments: {
+          orderBy: {
+            displayOrder: 'asc',
+          },
           include: {
-            contacts: true,
+            contacts: {
+              orderBy: {
+                displayOrder: 'asc'
+              }
+            },
           },
         },
+      },
+      orderBy: {
+        displayOrder: 'asc',
       },
     });
     return NextResponse.json(structures);
@@ -30,11 +40,18 @@ export async function POST(request: Request) {
         if (!name) {
             return NextResponse.json({ error: 'Name is required' }, { status: 400 });
         }
+        
+        const maxOrder = await prisma.structure.aggregate({
+            _max: {
+                displayOrder: true,
+            },
+        });
 
         const newStructure = await prisma.structure.create({
             data: {
                 name,
                 description,
+                displayOrder: (maxOrder._max.displayOrder ?? -1) + 1,
             },
         });
 

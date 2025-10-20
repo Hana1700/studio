@@ -12,10 +12,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name and structureId are required' }, { status: 400 });
         }
 
+        const maxOrder = await prisma.subDepartment.aggregate({
+            where: {
+                structureId: structureId,
+            },
+            _max: {
+                displayOrder: true,
+            },
+        });
+
         const newSubDepartment = await prisma.subDepartment.create({
             data: {
                 name,
                 structureId,
+                displayOrder: (maxOrder._max.displayOrder ?? -1) + 1,
             },
         });
 

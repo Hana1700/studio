@@ -15,6 +15,9 @@ async function getSubDepartmentData(structureId: string, subDepartmentId: string
         where: { id: subDepartmentId },
         include: {
             contacts: {
+              orderBy: {
+                displayOrder: 'asc'
+              },
               include: {
                 structure: true,
                 subDepartment: true,

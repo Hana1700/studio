@@ -14,6 +14,9 @@ const prisma = new PrismaClient();
 
 async function getStructures(): Promise<Structure[]> {
     const structures = await prisma.structure.findMany({
+        orderBy: {
+            displayOrder: 'asc'
+        },
         include: {
             subDepartments: {
                 select: {

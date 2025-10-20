@@ -20,6 +20,9 @@ async function getStructure(structureId: string): Promise<(Structure & { directC
         where: { id: structureId },
         include: {
             subDepartments: {
+                orderBy: {
+                    displayOrder: 'asc'
+                },
                 include: {
                     _count: {
                         select: { contacts: true }
@@ -35,6 +38,9 @@ async function getStructure(structureId: string): Promise<(Structure & { directC
         where: {
             structureId: structureId,
             subDepartmentId: null,
+        },
+        orderBy: {
+            displayOrder: 'asc'
         },
         include: {
             structure: true,

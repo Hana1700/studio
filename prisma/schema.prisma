@@ -1,48 +1,51 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+}
+
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
-generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
-}
-
-model Admin {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-}
-
 model Structure {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  displayOrder   Int?
   subDepartments SubDepartment[]
-  contacts      Contact[]
+  contacts       Contact[]
 }
 
 model SubDepartment {
-  id          String    @id @default(cuid())
-  name        String
-  structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  structureId String
-  contacts    Contact[]
+  id           String    @id @default(cuid())
+  name         String
+  displayOrder Int?
+  structure    Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structureId  String
+  contacts     Contact[]
 }
 
 model Contact {
   id              String         @id @default(cuid())
   name            String
   title           String
+  displayOrder    Int?
   threeDigits     String?
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
   structure       Structure      @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId     String
-  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: SetNull)
+  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: Cascade)
   subDepartmentId String?
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
 }
