@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -21,7 +22,8 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut, KeyRound } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut, KeyRound, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -34,6 +36,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
@@ -48,17 +51,29 @@ export default function AdminPage() {
   
   const [structures, setStructures] = useState<Structure[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+
+  // Dialog states
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isSubDepartmentDialogOpen, setIsSubDepartmentDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   
+  // Form states
   const [newStructureName, setNewStructureName] = useState('');
   const [newStructureDescription, setNewStructureDescription] = useState('');
   const [newSubDepartmentName, setNewSubDepartmentName] = useState('');
   const [parentStructureId, setParentStructureId] = useState('');
 
+  // Editing states
+  const [editingStructure, setEditingStructure] = useState<Structure | null>(null);
+  const [editingSubDepartment, setEditingSubDepartment] = useState<SubDepartment | null>(null);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+
+  // Deleting states
+  const [deletingStructure, setDeletingStructure] = useState<Structure | null>(null);
+  const [deletingSubDepartment, setDeletingSubDepartment] = useState<SubDepartment | null>(null);
+  const [isDeleteStructureAlertOpen, setIsDeleteStructureAlertOpen] = useState(false);
+  const [isDeleteSubDepartmentAlertOpen, setIsDeleteSubDepartmentAlertOpen] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -109,15 +124,45 @@ export default function AdminPage() {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+  
+  // --- Structure Actions ---
+  const handleAddNewStructure = () => {
+    setEditingStructure(null);
+    resetStructureForm();
+    setIsStructureDialogOpen(true);
+  };
+  
+  const handleEditStructure = (structure: Structure) => {
+    setEditingStructure(structure);
+    setNewStructureName(structure.name);
+    setNewStructureDescription(structure.description || '');
+    setIsStructureDialogOpen(true);
+  };
+
+  const handleDeleteStructure = async () => {
+    if (!deletingStructure) return;
+    const response = await fetch(`/api/structures/${deletingStructure.id}`, { method: 'DELETE' });
+    if (response.ok) {
+        await fetchData();
+        setDeletingStructure(null);
+        setIsDeleteStructureAlertOpen(false);
+    } else {
+        console.error("Failed to delete structure");
+    }
+  };
 
   const handleSaveStructure = async () => {
+    const isEditing = !!editingStructure;
+    const url = isEditing ? `/api/structures/${editingStructure.id}` : '/api/structures';
+    const method = isEditing ? 'PUT' : 'POST';
+
     const structureData = {
         name: newStructureName,
         description: newStructureDescription,
     };
 
-    const response = await fetch('/api/structures', {
-        method: 'POST',
+    const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(structureData),
     });
@@ -126,7 +171,6 @@ export default function AdminPage() {
         await fetchData();
         resetStructureForm();
         setIsStructureDialogOpen(false);
-        router.refresh();
     } else {
         console.error("Failed to save structure", await response.text());
     }
@@ -135,6 +179,7 @@ export default function AdminPage() {
   const resetStructureForm = () => {
     setNewStructureName('');
     setNewStructureDescription('');
+    setEditingStructure(null);
   };
   
   const handleCancelStructure = () => {
@@ -142,6 +187,72 @@ export default function AdminPage() {
     setIsStructureDialogOpen(false);
   };
 
+  // --- Sub-department Actions ---
+  const handleAddNewSubDepartment = (structureId: string) => {
+    setEditingSubDepartment(null);
+    resetSubDepartmentForm();
+    setParentStructureId(structureId);
+    setIsSubDepartmentDialogOpen(true);
+  };
+
+  const handleEditSubDepartment = (subDepartment: SubDepartment) => {
+    setEditingSubDepartment(subDepartment);
+    setNewSubDepartmentName(subDepartment.name);
+    setParentStructureId(subDepartment.structureId);
+    setIsSubDepartmentDialogOpen(true);
+  };
+  
+  const handleDeleteSubDepartment = async () => {
+    if (!deletingSubDepartment) return;
+    const response = await fetch(`/api/subdepartments/${deletingSubDepartment.id}`, { method: 'DELETE' });
+    if (response.ok) {
+        await fetchData();
+        setDeletingSubDepartment(null);
+        setIsDeleteSubDepartmentAlertOpen(false);
+    } else {
+        console.error("Failed to delete sub-department");
+    }
+  };
+
+  const handleSaveSubDepartment = async () => {
+    if (!newSubDepartmentName.trim()) return;
+
+    const isEditing = !!editingSubDepartment;
+    const url = isEditing ? `/api/subdepartments/${editingSubDepartment.id}` : '/api/subdepartments';
+    const method = isEditing ? 'PUT' : 'POST';
+
+    const subDeptData = {
+      name: newSubDepartmentName,
+      structureId: parentStructureId,
+    };
+    
+    const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subDeptData)
+    });
+
+    if (response.ok) {
+        await fetchData();
+        resetSubDepartmentForm();
+        setIsSubDepartmentDialogOpen(false);
+    } else {
+        console.error("Failed to save sub-department");
+    }
+  };
+
+  const resetSubDepartmentForm = () => {
+    setNewSubDepartmentName('');
+    setParentStructureId('');
+    setEditingSubDepartment(null);
+  };
+
+  const handleCancelSubDepartment = () => {
+    resetSubDepartmentForm();
+    setIsSubDepartmentDialogOpen(false);
+  };
+  
+  // --- Contact Actions ---
   const resetContactForm = () => {
     setEditingContact(null);
     setContactForm({
@@ -212,41 +323,8 @@ export default function AdminPage() {
     resetContactForm();
     setIsContactDialogOpen(false);
   };
-  
-  const handleSaveSubDepartment = async () => {
-    if (!parentStructureId || !newSubDepartmentName.trim()) return;
 
-    const subDeptData = {
-      name: newSubDepartmentName,
-      structureId: parentStructureId,
-    };
-    
-    const response = await fetch('/api/subdepartments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(subDeptData)
-    });
-
-
-    if (response.ok) {
-        await fetchData();
-        resetSubDepartmentForm();
-        setIsSubDepartmentDialogOpen(false);
-    } else {
-        console.error("Failed to save sub-department");
-    }
-  };
-
-  const resetSubDepartmentForm = () => {
-    setNewSubDepartmentName('');
-    setParentStructureId('');
-  };
-
-  const handleCancelSubDepartment = () => {
-    resetSubDepartmentForm();
-    setIsSubDepartmentDialogOpen(false);
-  };
-
+  // --- Password Actions ---
   const handleChangePassword = async () => {
     setPasswordError('');
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
@@ -323,11 +401,14 @@ export default function AdminPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setIsStructureDialogOpen(true)}>
+                <DropdownMenuItem onSelect={handleAddNewStructure}>
                   <Building className="mr-2 h-4 w-4" />
                   <span>Structure</span>
                 </DropdownMenuItem>
-                 <DropdownMenuItem onSelect={() => setIsSubDepartmentDialogOpen(true)}>
+                 <DropdownMenuItem onSelect={() => {
+                   resetSubDepartmentForm();
+                   setIsSubDepartmentDialogOpen(true);
+                 }}>
                   <Library className="mr-2 h-4 w-4" />
                   <span>Sous-direction</span>
                 </DropdownMenuItem>
@@ -344,22 +425,73 @@ export default function AdminPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-           <Accordion type="single" collapsible className="w-full">
+           <Accordion type="multiple" className="w-full">
             {Array.isArray(structures) && structures.map((structure) => (
               <AccordionItem value={`structure-${structure.id}`} key={structure.id}>
-                <AccordionTrigger>
-                    <div className='flex justify-between w-full items-center'>
-                         <p className="font-medium">{structure.name}</p>
-                         <div className='flex items-center'>
-                            <p className="text-sm text-muted-foreground mr-4">
-                                {structure.subDepartments.length} sous-direction(s)
-                            </p>
-                         </div>
-                    </div>
-                </AccordionTrigger>
+                <div className='flex items-center w-full'>
+                    <AccordionTrigger className="flex-1">
+                        <div className='flex justify-between w-full items-center'>
+                             <p className="font-medium">{structure.name}</p>
+                             <div className='flex items-center'>
+                                <p className="text-sm text-muted-foreground mr-4">
+                                    {structure.subDepartments.length} sous-direction(s)
+                                </p>
+                             </div>
+                        </div>
+                    </AccordionTrigger>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className='mr-2'>
+                                <MoreVertical className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => handleEditStructure(structure)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Modifier</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleAddNewSubDepartment(structure.id)}>
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                <span>Ajouter une sous-direction</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onSelect={() => {
+                                setDeletingStructure(structure);
+                                setIsDeleteStructureAlertOpen(true);
+                            }} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                <span>Supprimer</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                 <AccordionContent>
-                    <div className='pl-4 border-l'>
-                        <h4 className='font-medium mb-2'>Contacts</h4>
+                    <div className='pl-4 border-l ml-4'>
+                        <h4 className='font-medium mb-2 ml-4'>Sous-directions</h4>
+                        {structure.subDepartments.length > 0 ? (
+                           <div className="flex flex-col gap-1 ml-4">
+                             {structure.subDepartments.map(sub => (
+                               <div key={sub.id} className="flex items-center justify-between rounded-md p-2 hover:bg-muted/50">
+                                 <p className="text-sm">{sub.name}</p>
+                                 <div className='flex items-center'>
+                                    <Button variant="ghost" size="icon" onClick={() => handleEditSubDepartment(sub)}>
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => {
+                                        setDeletingSubDepartment(sub);
+                                        setIsDeleteSubDepartmentAlertOpen(true);
+                                    }}>
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                 </div>
+                               </div>
+                             ))}
+                           </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground text-center py-2">Aucune sous-direction.</p>
+                        )}
+                        <Separator className='my-4'/>
+                        <h4 className='font-medium mb-2 ml-4'>Contacts</h4>
                         {/* Mobile view */}
                         <div className="grid grid-cols-1 gap-4 md:hidden">
                            {contacts.filter(c => c.structureId === structure.id).map(contact => (
@@ -450,9 +582,9 @@ export default function AdminPage() {
       <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
-            <DialogTitle>Ajouter une nouvelle structure</DialogTitle>
+            <DialogTitle>{editingStructure ? "Modifier la structure" : "Ajouter une nouvelle structure"}</DialogTitle>
             <DialogDescription>
-              Remplissez les détails de la nouvelle structure.
+              Remplissez les détails de la structure.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-6 py-4">
@@ -491,9 +623,9 @@ export default function AdminPage() {
       <Dialog open={isSubDepartmentDialogOpen} onOpenChange={setIsSubDepartmentDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
-            <DialogTitle>Ajouter une sous-direction</DialogTitle>
+            <DialogTitle>{editingSubDepartment ? "Modifier la sous-direction" : "Ajouter une sous-direction"}</DialogTitle>
             <DialogDescription>
-              Sélectionnez une structure parente et nommez la nouvelle sous-direction.
+              {editingSubDepartment ? "Modifiez le nom de la sous-direction." : "Sélectionnez une structure parente et nommez la nouvelle sous-direction."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -501,7 +633,7 @@ export default function AdminPage() {
               <Label htmlFor="parent-structure" className="text-right">
                 Structure
               </Label>
-              <Select value={parentStructureId} onValueChange={setParentStructureId}>
+              <Select value={parentStructureId} onValueChange={setParentStructureId} disabled={!!editingSubDepartment}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Sélectionner une structure" />
                 </SelectTrigger>
@@ -666,6 +798,39 @@ export default function AdminPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Delete Confirmation Dialogs */}
+      <AlertDialog open={isDeleteStructureAlertOpen} onOpenChange={setIsDeleteStructureAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette structure ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Cela supprimera la structure, toutes ses sous-directions et tous les contacts associés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingStructure(null)}>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteStructure}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isDeleteSubDepartmentAlertOpen} onOpenChange={setIsDeleteSubDepartmentAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette sous-direction ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Cela supprimera la sous-direction et tous les contacts qui y sont directement associés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingSubDepartment(null)}>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteSubDepartment}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
+    
