@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,14 +24,12 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut, KeyRound, MoreVertical } from 'lucide-react';
+import { AlertCircle, PlusCircle, Building, Trash2, Edit, UserPlus, ChevronDown, Library, Smartphone, Phone, LogOut, KeyRound, MoreVertical, ChevronRight, Users, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Contact, Structure, SubDepartment } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +41,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Breadcrumbs } from '@/components/breadcrumb';
 
+
+type View = 'structures' | 'subdepartments' | 'contacts';
 
 export default function AdminPage() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -51,6 +53,11 @@ export default function AdminPage() {
   
   const [structures, setStructures] = useState<Structure[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+
+  // Navigation state
+  const [view, setView] = useState<View>('structures');
+  const [selectedStructure, setSelectedStructure] = useState<Structure | null>(null);
+  const [selectedSubDepartment, setSelectedSubDepartment] = useState<SubDepartment | null>(null);
 
   // Dialog states
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
@@ -72,9 +79,9 @@ export default function AdminPage() {
   // Deleting states
   const [deletingStructure, setDeletingStructure] = useState<Structure | null>(null);
   const [deletingSubDepartment, setDeletingSubDepartment] = useState<SubDepartment | null>(null);
-  const [isDeleteStructureAlertOpen, setIsDeleteStructureAlertOpen] = useState(false);
-  const [isDeleteSubDepartmentAlertOpen, setIsDeleteSubDepartmentAlertOpen] = useState(false);
-
+  const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -124,6 +131,44 @@ export default function AdminPage() {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  // --- Navigation ---
+  const navigateToStructureDetail = (structure: Structure) => {
+    setSelectedStructure(structure);
+    setView('subdepartments');
+  };
+
+  const navigateToSubDepartmentDetail = (subDepartment: SubDepartment) => {
+    setSelectedSubDepartment(subDepartment);
+    setView('contacts');
+  };
+
+  const goBack = () => {
+    if (view === 'contacts') {
+      setSelectedSubDepartment(null);
+      setView('subdepartments');
+    } else if (view === 'subdepartments') {
+      setSelectedSubDepartment(null);
+      setSelectedStructure(null);
+      setView('structures');
+    }
+  };
+  
+  const getBreadcrumbItems = () => {
+    const items = [{ label: 'Administration', onClick: () => { setSelectedStructure(null); setSelectedSubDepartment(null); setView('structures'); } }];
+    if (selectedStructure) {
+      items.push({ label: selectedStructure.name, onClick: () => { setSelectedSubDepartment(null); setView('subdepartments'); } });
+    }
+    if (selectedSubDepartment) {
+      items.push({ label: selectedSubDepartment.name, onClick: () => {} });
+    }
+    return items.map((item, index) => ({
+      label: item.label,
+      href: '#',
+      onClick: (e: React.MouseEvent) => { e.preventDefault(); if(index < items.length - 1) item.onClick(); },
+    }));
+  };
+
   
   // --- Structure Actions ---
   const handleAddNewStructure = () => {
@@ -139,17 +184,10 @@ export default function AdminPage() {
     setIsStructureDialogOpen(true);
   };
 
-  const handleDeleteStructure = async () => {
-    if (!deletingStructure) return;
-    const response = await fetch(`/api/structures/${deletingStructure.id}`, { method: 'DELETE' });
-    if (response.ok) {
-        await fetchData();
-        setDeletingStructure(null);
-        setIsDeleteStructureAlertOpen(false);
-    } else {
-        console.error("Failed to delete structure");
-    }
-  };
+  const handleDeleteStructure = (structure: Structure) => {
+    setDeletingStructure(structure);
+    setIsDeleteAlertOpen(true);
+  }
 
   const handleSaveStructure = async () => {
     const isEditing = !!editingStructure;
@@ -201,17 +239,10 @@ export default function AdminPage() {
     setParentStructureId(subDepartment.structureId);
     setIsSubDepartmentDialogOpen(true);
   };
-  
-  const handleDeleteSubDepartment = async () => {
-    if (!deletingSubDepartment) return;
-    const response = await fetch(`/api/subdepartments/${deletingSubDepartment.id}`, { method: 'DELETE' });
-    if (response.ok) {
-        await fetchData();
-        setDeletingSubDepartment(null);
-        setIsDeleteSubDepartmentAlertOpen(false);
-    } else {
-        console.error("Failed to delete sub-department");
-    }
+
+  const handleDeleteSubDepartment = (subDepartment: SubDepartment) => {
+    setDeletingSubDepartment(subDepartment);
+    setIsDeleteAlertOpen(true);
   };
 
   const handleSaveSubDepartment = async () => {
@@ -263,8 +294,8 @@ export default function AdminPage() {
         fourDigits: '',
         fourDigitsXX: '',
         fourDigitsYY: '',
-        structureId: '',
-        subDepartmentId: '',
+        structureId: selectedStructure?.id || '',
+        subDepartmentId: selectedSubDepartment?.id || '',
     });
   };
 
@@ -288,16 +319,10 @@ export default function AdminPage() {
     });
     setIsContactDialogOpen(true);
   };
-
-  const handleDeleteContact = async (contactId: string) => {
-    const response = await fetch(`/api/contacts/${contactId}`, {
-        method: 'DELETE',
-    });
-    if (response.ok) {
-        await fetchData();
-    } else {
-        console.error("Failed to delete contact");
-    }
+  
+  const handleDeleteContact = (contact: Contact) => {
+    setDeletingContact(contact);
+    setIsDeleteAlertOpen(true);
   };
 
   const handleSaveContact = async () => {
@@ -322,6 +347,35 @@ export default function AdminPage() {
   const handleCancelContact = () => {
     resetContactForm();
     setIsContactDialogOpen(false);
+  };
+
+  // --- Delete confirmation ---
+  const confirmDelete = async () => {
+    let response;
+    if (deletingStructure) {
+      response = await fetch(`/api/structures/${deletingStructure.id}`, { method: 'DELETE' });
+    } else if (deletingSubDepartment) {
+      response = await fetch(`/api/subdepartments/${deletingSubDepartment.id}`, { method: 'DELETE' });
+    } else if (deletingContact) {
+      response = await fetch(`/api/contacts/${deletingContact.id}`, { method: 'DELETE' });
+    }
+
+    if (response && response.ok) {
+      await fetchData();
+      if (deletingStructure) {
+        const updatedStructures = structures.filter(s => s.id !== deletingStructure.id);
+        if (selectedStructure && selectedStructure.id === deletingStructure.id) {
+          goBack();
+        }
+      }
+    } else {
+      console.error("Failed to delete item");
+    }
+    
+    setDeletingStructure(null);
+    setDeletingSubDepartment(null);
+    setDeletingContact(null);
+    setIsDeleteAlertOpen(false);
   };
 
   // --- Password Actions ---
@@ -361,17 +415,222 @@ export default function AdminPage() {
   };
 
   const availableSubDepartments = contactForm.structureId ? structures.find(s => s.id === contactForm.structureId)?.subDepartments : [];
+  
+  const getContactsForStructure = (structureId: string) => {
+    return contacts.filter(c => c.structureId === structureId && !c.subDepartmentId);
+  }
+
+  const getContactsForSubDepartment = (subDepartmentId: string) => {
+    return contacts.filter(c => c.subDepartmentId === subDepartmentId);
+  }
 
   if (!isAuthenticated) {
     return null;
   }
+  
+  const breadcrumbItems = getBreadcrumbItems();
+
+  const renderContent = () => {
+    switch (view) {
+      case 'structures':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {structures.map(structure => {
+              const structureContacts = contacts.filter(c => c.structureId === structure.id);
+              return(
+              <Card key={structure.id} className="flex flex-col">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5 text-primary" />
+                    {structure.name}
+                  </CardTitle>
+                  <CardDescription>{structure.description || 'Pas de description'}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Library className="h-4 w-4" />
+                    <span>{structure.subDepartments.length} sous-direction(s)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    <span>{structureContacts.length} contact(s)</span>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button variant="outline" onClick={() => navigateToStructureDetail(structure)}>
+                    Voir le détail
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => handleEditStructure(structure)}>
+                        <Edit className="mr-2 h-4 w-4" /> Modifier
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => handleDeleteStructure(structure)} className="text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardFooter>
+              </Card>
+            )})}
+          </div>
+        );
+      case 'subdepartments':
+        if (!selectedStructure) return null;
+        const directContacts = getContactsForStructure(selectedStructure.id);
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Sous-directions</h2>
+              <Button onClick={() => handleAddNewSubDepartment(selectedStructure.id)}>
+                <PlusCircle className="mr-2 h-4 w-4"/> Ajouter une sous-direction
+              </Button>
+            </div>
+            {selectedStructure.subDepartments.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {selectedStructure.subDepartments.map(sub => {
+                  const subContactsCount = contacts.filter(c => c.subDepartmentId === sub.id).length;
+                  return (
+                    <Card key={sub.id} className="flex flex-col">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Library className="h-5 w-5 text-primary" />
+                          {sub.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>{subContactsCount} contact(s)</span>
+                         </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <Button variant="outline" onClick={() => navigateToSubDepartmentDetail(sub)}>
+                            Voir les contacts
+                            <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onSelect={() => handleEditSubDepartment(sub)}>
+                                <Edit className="mr-2 h-4 w-4" /> Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => handleDeleteSubDepartment(sub)} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                      </CardFooter>
+                    </Card>
+                )})}
+              </div>
+            ) : <p className="text-muted-foreground text-center py-8">Aucune sous-direction dans cette structure.</p>}
+            
+            <Separator className="my-8" />
+            
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Contacts directs</h2>
+               <Button onClick={handleAddNewContact}>
+                <UserPlus className="mr-2 h-4 w-4"/> Ajouter un contact
+              </Button>
+            </div>
+            {directContacts.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {directContacts.map(contact => (
+                        <Card key={contact.id}>
+                          <CardHeader className="flex flex-row items-start justify-between">
+                            <div className="flex items-center gap-4">
+                              <Avatar>
+                                <AvatarFallback>{contact.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <CardTitle className="text-lg">{contact.name}</CardTitle>
+                                <CardDescription>{contact.title}</CardDescription>
+                              </div>
+                            </div>
+                             <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onSelect={() => handleEditContact(contact)}><Edit className="mr-2 h-4 w-4" /> Modifier</DropdownMenuItem>
+                                  <DropdownMenuItem onSelect={() => handleDeleteContact(contact)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Supprimer</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                          </CardHeader>
+                          <CardContent className="text-sm space-y-2">
+                             <p><Phone className="inline mr-2 h-4 w-4" />{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</p>
+                             {contact.fourDigitsYY && <p><Smartphone className="inline mr-2 h-4 w-4" />{contact.fourDigitsYY}</p>}
+                          </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            ) : <p className="text-muted-foreground text-center py-8">Aucun contact direct dans cette structure.</p>}
+
+          </div>
+        );
+      case 'contacts':
+        if (!selectedSubDepartment) return null;
+        const subDeptContacts = getContactsForSubDepartment(selectedSubDepartment.id);
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Contacts de {selectedSubDepartment.name}</h2>
+              <Button onClick={handleAddNewContact}>
+                <UserPlus className="mr-2 h-4 w-4"/> Ajouter un contact
+              </Button>
+            </div>
+            {subDeptContacts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {subDeptContacts.map(contact => (
+                   <Card key={contact.id}>
+                      <CardHeader className="flex flex-row items-start justify-between">
+                        <div className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarFallback>{contact.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <CardTitle className="text-lg">{contact.name}</CardTitle>
+                            <CardDescription>{contact.title}</CardDescription>
+                          </div>
+                        </div>
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onSelect={() => handleEditContact(contact)}><Edit className="mr-2 h-4 w-4" /> Modifier</DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => handleDeleteContact(contact)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Supprimer</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                      </CardHeader>
+                      <CardContent className="text-sm space-y-2">
+                         <p><Phone className="inline mr-2 h-4 w-4" />{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</p>
+                         {contact.fourDigitsYY && <p><Smartphone className="inline mr-2 h-4 w-4" />{contact.fourDigitsYY}</p>}
+                      </CardContent>
+                    </Card>
+                ))}
+              </div>
+            ) : <p className="text-muted-foreground text-center py-8">Aucun contact dans cette sous-direction.</p>}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
            <h1 className="font-headline text-3xl font-bold tracking-tight">
-            Administrateur
+            Administration
           </h1>
           <p className="text-muted-foreground">Connecté en tant que {user?.username}</p>
         </div>
@@ -387,10 +646,40 @@ export default function AdminPage() {
         </div>
       </div>
 
-       <Card>
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Gérer les structures et contacts</CardTitle>
+            <div>
+               {view !== 'structures' ? (
+                <div className="flex items-center gap-4">
+                  <Button variant="outline" size="icon" onClick={goBack}>
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <div>
+                    <nav aria-label="Breadcrumb" className={'mb-1'}>
+                      <ol className="flex items-center space-x-1 text-sm text-muted-foreground md:space-x-2">
+                        {breadcrumbItems.map((item, index) => (
+                          <li key={index} className="flex items-center">
+                            <button
+                              onClick={item.onClick}
+                              className={`capitalize hover:text-primary ${index === breadcrumbItems.length - 1 ? 'font-medium text-foreground pointer-events-none' : ''}`}
+                            >
+                              {item.label}
+                            </button>
+                            {index < breadcrumbItems.length - 1 && (
+                              <ChevronRight className="ml-1 h-4 w-4 flex-shrink-0 md:ml-2" />
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </nav>
+                     <CardTitle>Gérer {selectedSubDepartment?.name || selectedStructure?.name || 'les entités'}</CardTitle>
+                  </div>
+                </div>
+              ) : (
+                <CardTitle>Gérer les structures</CardTitle>
+              )}
+            </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -407,12 +696,13 @@ export default function AdminPage() {
                 </DropdownMenuItem>
                  <DropdownMenuItem onSelect={() => {
                    resetSubDepartmentForm();
+                   setParentStructureId(selectedStructure?.id || '');
                    setIsSubDepartmentDialogOpen(true);
-                 }}>
+                 }} disabled={!selectedStructure}>
                   <Library className="mr-2 h-4 w-4" />
                   <span>Sous-direction</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleAddNewContact}>
+                <DropdownMenuItem onSelect={handleAddNewContact} disabled={!selectedStructure}>
                   <UserPlus className="mr-2 h-4 w-4" />
                   <span>Contact</span>
                 </DropdownMenuItem>
@@ -420,162 +710,9 @@ export default function AdminPage() {
             </DropdownMenu>
 
           </div>
-          <CardDescription>
-            Ajoutez, modifiez ou supprimez des structures et des contacts.
-          </CardDescription>
         </CardHeader>
         <CardContent>
-           <Accordion type="multiple" className="w-full">
-            {Array.isArray(structures) && structures.map((structure) => (
-              <AccordionItem value={`structure-${structure.id}`} key={structure.id}>
-                <div className='flex items-center w-full'>
-                    <AccordionTrigger className="flex-1">
-                        <div className='flex justify-between w-full items-center'>
-                             <p className="font-medium">{structure.name}</p>
-                             <div className='flex items-center'>
-                                <p className="text-sm text-muted-foreground mr-4">
-                                    {structure.subDepartments.length} sous-direction(s)
-                                </p>
-                             </div>
-                        </div>
-                    </AccordionTrigger>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className='mr-2'>
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => handleEditStructure(structure)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                <span>Modifier</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleAddNewSubDepartment(structure.id)}>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                <span>Ajouter une sous-direction</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onSelect={() => {
-                                setDeletingStructure(structure);
-                                setIsDeleteStructureAlertOpen(true);
-                            }} className="text-destructive">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                <span>Supprimer</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-                <AccordionContent>
-                    <div className='pl-4 border-l ml-4'>
-                        <h4 className='font-medium mb-2 ml-4'>Sous-directions</h4>
-                        {structure.subDepartments.length > 0 ? (
-                           <div className="flex flex-col gap-1 ml-4">
-                             {structure.subDepartments.map(sub => (
-                               <div key={sub.id} className="flex items-center justify-between rounded-md p-2 hover:bg-muted/50">
-                                 <p className="text-sm">{sub.name}</p>
-                                 <div className='flex items-center'>
-                                    <Button variant="ghost" size="icon" onClick={() => handleEditSubDepartment(sub)}>
-                                        <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => {
-                                        setDeletingSubDepartment(sub);
-                                        setIsDeleteSubDepartmentAlertOpen(true);
-                                    }}>
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                 </div>
-                               </div>
-                             ))}
-                           </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground text-center py-2">Aucune sous-direction.</p>
-                        )}
-                        <Separator className='my-4'/>
-                        <h4 className='font-medium mb-2 ml-4'>Contacts</h4>
-                        {/* Mobile view */}
-                        <div className="grid grid-cols-1 gap-4 md:hidden">
-                           {contacts.filter(c => c.structureId === structure.id).map(contact => (
-                            <Card key={contact.id}>
-                              <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                                <Avatar className='h-10 w-10'>
-                                  <AvatarFallback>
-                                    {contact.name.split(' ').map((n) => n[0]).join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <CardTitle className="text-base font-medium">{contact.name}</CardTitle>
-                                  <CardDescription>{contact.title}</CardDescription>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="space-y-2 text-sm pt-2">
-                                {contact.subDepartmentName && <p><span className="font-semibold">Service:</span> {contact.subDepartmentName}</p>}
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4 text-muted-foreground" />
-                                  <span>{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</span>
-                                </div>
-                                {contact.fourDigitsYY && (
-                                  <div className="flex items-center gap-2">
-                                    <Smartphone className="h-4 w-4 text-muted-foreground" />
-                                    <span>{contact.fourDigitsYY}</span>
-                                  </div>
-                                )}
-                              </CardContent>
-                              <div className="flex justify-end p-2 pt-0">
-                                <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(contact.id)}>
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                              </div>
-                            </Card>
-                          ))}
-                        </div>
-
-                        {/* Desktop view */}
-                        <Table className="hidden md:table">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Nom</TableHead>
-                                    <TableHead>Sous-direction</TableHead>
-                                    <TableHead>Téléphone</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                             <TableBody>
-                                {contacts.filter(c => c.structureId === structure.id).map(contact => (
-                                    <TableRow key={contact.id}>
-                                    <TableCell>
-                                        <div className="font-medium">{contact.name}</div>
-                                        <div className="text-sm text-muted-foreground">{contact.title}</div>
-                                    </TableCell>
-                                    <TableCell>{contact.subDepartmentName}</TableCell>
-                                    <TableCell>{`${contact.threeDigits} ${contact.fourDigits} ${contact.fourDigitsXX}`}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEditContact(contact)}>
-                                        <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(contact.id)}>
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                        </Button>
-                                    </TableCell>
-                                    </TableRow>
-                                ))}
-                                {contacts.filter(c => c.structureId === structure.id).length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center text-muted-foreground">Aucun contact dans cette structure.</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                         {contacts.filter(c => c.structureId === structure.id).length === 0 && (
-                            <p className="text-sm text-center text-muted-foreground py-4 md:hidden">Aucun contact dans cette structure.</p>
-                        )}
-                    </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          {renderContent()}
         </CardContent>
       </Card>
 
@@ -799,33 +936,18 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialogs */}
-      <AlertDialog open={isDeleteStructureAlertOpen} onOpenChange={setIsDeleteStructureAlertOpen}>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette structure ?</AlertDialogTitle>
+            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irréversible. Cela supprimera la structure, toutes ses sous-directions et tous les contacts associés.
+              Cette action est irréversible. L'élément et toutes ses données associées (sous-directions, contacts) seront définitivement supprimés.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeletingStructure(null)}>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteStructure}>Supprimer</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isDeleteSubDepartmentAlertOpen} onOpenChange={setIsDeleteSubDepartmentAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette sous-direction ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Cela supprimera la sous-direction et tous les contacts qui y sont directement associés.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeletingSubDepartment(null)}>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSubDepartment}>Supprimer</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setIsDeleteAlertOpen(false)}>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
