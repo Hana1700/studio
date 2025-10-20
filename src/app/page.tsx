@@ -3,7 +3,7 @@ import { SearchBar } from '@/components/search-bar';
 
 export default function Home() {
   return (
-    <div className="flex h-full flex-col items-center justify-center space-y-8 text-center -mt-16">
+    <div className="flex h-full flex-col items-center justify-center space-y-8 text-center">
       <div className="flex items-center space-x-4">
         <AppLogo className="h-20 w-20 text-primary" />
         <h1 className="font-headline text-5xl font-bold tracking-tight">
