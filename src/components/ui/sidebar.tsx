@@ -24,7 +24,7 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3.5rem"
+const SIDEBAR_WIDTH_ICON = "0rem" // Changed from 3.5rem to 0rem
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
@@ -83,9 +83,6 @@ const SidebarProvider = React.forwardRef<
         } else {
           _setOpen(openState)
         }
-
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
       [setOpenProp, open]
     )
@@ -204,9 +201,10 @@ const Sidebar = React.forwardRef<
         data-side={side}
         data-state={open ? "expanded" : "collapsed"}
         className={cn(
-          "peer z-30 hidden h-svh flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width,margin] ease-in-out sm:flex",
+          "peer z-30 hidden h-svh flex-col border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width,margin] ease-in-out sm:flex",
           "data-[state=expanded]:w-[--sidebar-width]",
           "data-[state=collapsed]:w-[--sidebar-width-icon]",
+          "data-[state=collapsed]:border-r-0",
           "data-[side=right]:-order-1 data-[side=right]:ml-0 data-[side=right]:border-l data-[side=right]:border-r-0",
           className
         )}
