@@ -65,6 +65,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
       (contact) =>
         contact.name.toLowerCase().includes(search.toLowerCase()) ||
         contact.title.toLowerCase().includes(search.toLowerCase()) ||
+        contact.structureName?.toLowerCase().includes(search.toLowerCase()) ||
         contact.subDepartmentName?.toLowerCase().includes(search.toLowerCase())
     ) || [];
 
@@ -81,7 +82,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Filtrer par service, nom, poste..."
+          placeholder="Filtrer par direction, service, nom, poste..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full max-w-sm pl-9"
@@ -102,6 +103,7 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Direction</TableHead>
                   <TableHead>Sous-direction</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead>3 chiffres</TableHead>
@@ -119,8 +121,11 @@ export function ContactList({ contacts }: { contacts: Contact[] }) {
 
                   return (
                     <TableRow key={contact.id} className={'cursor-pointer'}>
+                      <TableCell>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.structureName}</CellComponent>
+                      </TableCell>
                        <TableCell>
-                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.subDepartmentName}</CellComponent>
+                        <CellComponent {...cellProps} className="block hover:text-primary">{contact.subDepartmentName || '-'}</CellComponent>
                       </TableCell>
                       <TableCell className="font-medium">
                         <CellComponent {...cellProps} className="block hover:text-primary">
