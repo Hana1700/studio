@@ -54,4 +54,4 @@ COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/clie
 EXPOSE 3000
 
 # Run migrations, seed the database, and start the application
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]

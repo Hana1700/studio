@@ -45,3 +45,4 @@ firebase-debug.log
 firestore-debug.log
 prisma/migrations/
 prisma/dev.db
+data/dev.db

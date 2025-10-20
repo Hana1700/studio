@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -13,3 +11,4 @@ services:
       - ./prisma:/app/prisma
     # La commande est maintenant gérée par le Dockerfile pour plus de cohérence
     # et pour s'assurer que l'environnement est correctement configuré.
+      - ./data/dev.db:/app/prisma/dev.db

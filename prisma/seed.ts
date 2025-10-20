@@ -9,9 +9,9 @@ async function main() {
   console.log('Seeding database...');
 
   // Clear existing data
-  await prisma.contact.deleteMany();
-  await prisma.subDepartment.deleteMany();
-  await prisma.structure.deleteMany();
+  // await prisma.contact.deleteMany();
+  // await prisma.subDepartment.deleteMany();
+  // await prisma.structure.deleteMany();
   await prisma.admin.deleteMany();
 
   // Seed Admin
