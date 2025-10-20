@@ -6,6 +6,9 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const contacts = await prisma.contact.findMany({
+      orderBy: {
+        displayOrder: 'asc'
+      },
       include: {
         structure: true,
         subDepartment: true,
@@ -32,6 +35,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name, title and structureId are required' }, { status: 400 });
         }
         
+        // Find the maximum displayOrder for the given context (either direct or in sub-department)
+        const maxOrderResult = await prisma.contact.aggregate({
+            where: {
+                structureId: structureId,
+                subDepartmentId: subDepartmentId || null,
+            },
+            _max: {
+                displayOrder: true,
+            },
+        });
+        
+        const newDisplayOrder = (maxOrderResult._max.displayOrder ?? -1) + 1;
+
         const contactData = {
             name,
             title,
@@ -41,6 +57,7 @@ export async function POST(request: Request) {
             fourDigitsYY,
             structureId,
             subDepartmentId: subDepartmentId || null,
+            displayOrder: newDisplayOrder,
         };
 
         const newContact = await prisma.contact.create({

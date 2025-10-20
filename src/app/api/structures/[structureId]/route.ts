@@ -9,7 +9,11 @@ export async function GET(request: Request, { params }: { params: { structureId:
     const structure = await prisma.structure.findUnique({
       where: { id: params.structureId },
       include: {
-        subDepartments: true,
+        subDepartments: {
+          orderBy: {
+            displayOrder: 'asc',
+          },
+        },
       },
     });
 
@@ -51,7 +55,6 @@ export async function PUT(request: Request, { params }: { params: { structureId:
 
 export async function DELETE(request: Request, { params }: { params: { structureId: string } }) {
     try {
-        // Prisma's onDelete: Cascade will handle deleting related subDepartments and contacts
         await prisma.structure.delete({
             where: { id: params.structureId },
         });

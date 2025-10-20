@@ -2,37 +2,30 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider        = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
-
-model Admin {
-  id       String @id @default(cuid())
-  username String @unique
-  password String
+  provider     = "sqlite"
+  url          = env("DATABASE_URL")
 }
 
 model Structure {
-  id             String          @id @default(cuid())
-  name           String
-  description    String?
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
   subDepartments SubDepartment[]
-  contacts       Contact[]
-  displayOrder   Int             @default(0)
+  displayOrder  Int             @default(0)
+  contacts      Contact[]
 }
 
 model SubDepartment {
-  id           String    @id @default(cuid())
-  name         String
-  structure    Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  structureId  String
-  contacts     Contact[]
-  displayOrder Int       @default(0)
+  id          String    @id @default(cuid())
+  name        String
+  structure   Structure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structureId String
+  contacts    Contact[]
+  displayOrder Int      @default(0)
 }
 
 model Contact {
@@ -43,9 +36,15 @@ model Contact {
   fourDigits      String?
   fourDigitsXX    String?
   fourDigitsYY    String?
-  structure       Structure      @relation(fields: [structureId], references: [id], onDelete: Cascade)
   structureId     String
-  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id])
+  structure       Structure      @relation(fields: [structureId], references: [id], onDelete: Cascade)
   subDepartmentId String?
+  subDepartment   SubDepartment? @relation(fields: [subDepartmentId], references: [id], onDelete: Cascade)
   displayOrder    Int            @default(0)
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
 }
